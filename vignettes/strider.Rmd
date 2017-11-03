@@ -23,6 +23,10 @@ The **strided_pointer** template is as minimalist as possible. It inherits from 
 
 The **strided_pointer** and related functions are designed to be used in C++ code. 
 
+```{r echo=FALSE}
+Sys.setenv(PKG_CPPFLAGS = "-I../inst/include")
+```
+
 ### Column sums
 
 As a minimal example, consider computing the column sums of a matrix. Working with standard library data structures, we can compute columns sums using ```transform``` and ```accumulate```. For multidimensional data, we need to iterate over the columns, then the rows. To do this, we construct a **strided_pointer** that skips to the first element of each column. From there, we can accumulate the values easily.
@@ -38,6 +42,8 @@ using Rcpp::NumericMatrix;
 using std::accumulate;
 using std::transform;
 #include <strider.h>
+using strider::stri_begin;
+using strider::stri_end;
 
 // [[Rcpp::export]]
 NumericVector test_col_sum(const NumericMatrix& x)
@@ -48,7 +54,7 @@ NumericVector test_col_sum(const NumericMatrix& x)
   auto data = &x[0];
   NumericVector res(nc);
   transform(stri_begin(data, nr), stri_end(data, nr, nc), &res[0],
-            [=](const double& v){ return accumulate(&v, &v + nr, 0.0); });
+            [&](const double& v){ return accumulate(&v, &v + nr, 0.0); });
   return res;
 }
 
@@ -87,6 +93,8 @@ using Rcpp::NumericMatrix;
 using std::accumulate;
 using std::transform;
 #include <strider.h>
+using strider::stri_begin;
+using strider::stri_end;
 
 // [[Rcpp::export]]
 NumericVector test_row_sum(const NumericMatrix& x)
@@ -96,7 +104,7 @@ NumericVector test_row_sum(const NumericMatrix& x)
     nc = x.ncol();
   auto data = &x[0];
   NumericVector res(nr);
-  transform(data, data + nr, &res[0], [=](const double& v){
+  transform(data, data + nr, &res[0], [&](const double& v){
     return accumulate(stri_begin(&v, nr), stri_end(&v, nr, nc), 0.0); });
   return res;
 }
@@ -131,6 +139,8 @@ using Rcpp::NumericMatrix;
 using std::for_each;
 using std::transform;
 #include <strider.h>
+using strider::stri_begin;
+using strider::stri_end;
 
 // [[Rcpp::export]]
 NumericVector test_row_sum2(const NumericMatrix& x)
@@ -143,7 +153,7 @@ NumericVector test_row_sum2(const NumericMatrix& x)
   auto rptr = &res[0];
   for_each(stri_begin(data, nr),
            stri_end(data, nr, nc),
-           [=](const double& x){
+           [&](const double& x){
              transform(&x, &x + nr, rptr, rptr,
                        [](const double& a, const double& b){
                          return a + b; });});
@@ -168,7 +178,7 @@ mb = microbenchmark(test_col_sum(x), colSums(x),
 print(mb, signif = 3)
 ```
 
-The speed-up is quite remarkable, roughly three times faster than R's native ```rowSums``` and even faster than R's built-in ```colSums``` function.
+The speed-up is quite remarkable, roughly three times faster than R's native ```rowSums``` and even faster than R's built-in ```colSums``` function. Experimenting with this code suggests that capture-by-value versus capture-by-reference has no impact on performance. However, using pass-by-value for the lambda arguments causes a dramatic slowdown. This is undoubtedly an issue with function inlining or other compiler optimizations.
 
 ```{r fig.width = 6, fig.height = 4}
 library(ggplot2)
@@ -189,6 +199,7 @@ using Rcpp::IntegerVector;
 #include <vector>
 using std::vector;
 #include <strider.h>
+using strider::make_stri_range;
 
 // [[Rcpp::export]]
 SEXP test_nth_values(const IntegerVector& x, int stride, int strides)
@@ -199,7 +210,7 @@ SEXP test_nth_values(const IntegerVector& x, int stride, int strides)
 }
 ```
 
-The ```make_stri_range``` simply encapsulates calls to ```stri_begin``` and ```stri_end```. It is currently a very minimal implementation. A range concept is not yet a part of the standard library.
+The ```make_stri_range``` simply encapsulates calls to ```stri_begin``` and ```stri_end```. It is currently a very minimal implementation. There is no boundary checking, so improper use will cause heap corruption. Other than ```begin``` and ```end``` methods, a range concept is not yet a part of the standard library. See also  [Boost Range v2](http://www.boost.org/doc/libs/release/libs/range/) and the [range-v3 proposal](https://github.com/ericniebler/range-v3). Both implement strided iterators over ranges, but would not be considered light-weight.
 
 ```{r}
 test_nth_values(1:1000, 21, 11)
@@ -207,7 +218,9 @@ test_nth_values(1:1000, 21, 11)
 
 ## Conclusions
 
-Experimenting with the C++ standard library algorithms demonstrates that they are often highly efficient, often faster than corresponding native R algorithms. However using the standard library algorithms with multidimensional data is challenging and it is quite common to resort to index-based for loops.
+Experimenting with the C++ standard library algorithms demonstrates that they are often highly efficient and, in some cases, faster than corresponding native R algorithms. However using the standard library algorithms with multidimensional data is challenging and it is quite common for authors to resort to index-based for-loops, which can impede performance.
 
-The **strider** package provides a lightweight pointer-adaptor that makes using the standard library algorithms straightforward with contiguous, structured legacy buffers accessible via a pointer. As long as one knows the dimensions and the memory layout of the data, then any dimension can be scanned by computing a stride and number of strides. When it is possible to scan the data sequentially, maximum performance is attained. Owning to the large number of legacy libraries whose APIs pass raw pointers to structured buffers, I expect that **strider** may find a wide range of applications while improving code reliability and comprehension.
+The **strider** package provides a lightweight pointer-adaptor that makes using the standard library algorithms straightforward with contiguous, structured legacy buffers accessible via a pointer. As long as one knows the dimensions and the memory layout of the data, then any dimension can be scanned by computing a stride and number of strides. When it is possible to scan the data sequentially, maximum performance is attained. Owning to the large number of legacy libraries whose APIs pass raw pointers to structured buffers, I expect that **strider** may find a wide range of applications while also improving code reliability and comprehension.
+
+***
 
