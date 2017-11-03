@@ -1,13 +1,15 @@
 #ifndef __STRIDER_H__
 #define __STRIDER_H__
 
+#include <cassert>
 #include <boost/iterator/iterator_facade.hpp>
+
+namespace strider {
+namespace detail {
 
 using boost::iterator_facade;
 using boost::random_access_traversal_tag;
 using boost::iterator_core_access;
-
-#include <cassert>
 
 using std::ptrdiff_t;
 
@@ -83,5 +85,15 @@ make_stri_range(T* ptr, ptrdiff_t stride, ptrdiff_t strides)
 {
   return stri_range<T>(ptr, stride, strides);
 }
+
+}; // namespace detail
+
+using detail::stri_end;
+using detail::stri_range;
+using detail::stri_begin;
+using detail::make_stri_range;
+using detail::strided_pointer;
+
+}; // namespace strider
 
 #endif // __STRIDER_H__
