@@ -17,6 +17,8 @@ using std::transform;
 using std::for_each;
 
 #include <strider.h>
+using strider::stri_begin;
+using strider::stri_end;
 
 // [[Rcpp::export]]
 NumericVector test_row_sum(NumericMatrix& x)
