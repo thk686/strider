@@ -14,6 +14,7 @@ using Rcpp::NumericMatrix;
 using std::vector;
 using std::accumulate;
 using std::transform;
+using std::for_each;
 
 #include <strider.h>
 
@@ -27,6 +28,25 @@ NumericVector test_row_sum(NumericMatrix& x)
   NumericVector res(nr);
   transform(data, data + nr, &res[0], [=](const double& v){
     return accumulate(stri_begin(&v, nr), stri_end(&v, nr, nc), 0.0); });
+  return res;
+}
+
+// [[Rcpp::export]]
+NumericVector test_row_sum2(NumericMatrix& x)
+{
+  auto
+    nr = x.nrow(),
+    nc = x.ncol();
+  NumericVector res(nr, 0.0);
+  auto
+    data = &x[0],
+    rptr = &res[0];
+  for_each(stri_begin(data, nr),
+           stri_end(data, nr, nc),
+           [=](const double& x){
+             transform(&x, &x + nr, rptr, rptr,
+                       [](const double& a, const double& b){
+                         return a + b; });});
   return res;
 }
 
