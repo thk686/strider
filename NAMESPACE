@@ -1,0 +1,3 @@
+useDynLib(strider, .registration=TRUE)
+exportPattern("^[[:alpha:]]+")
+importFrom(Rcpp, evalCpp)

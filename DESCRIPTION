@@ -1,0 +1,15 @@
+Package: strider
+Type: Package
+Title: Strided Pointer Iterator and Range
+Version: 1.0
+Date: 2017-11-03
+Author: Tim Keitt
+Maintainer: Tim Keitt <tkeitt@gmail.com>
+Description: The strided pointer adapts legacy buffers to the C++ standard library and range-based for-loops.
+License: GPL (>= 2)
+Imports: Rcpp (>= 0.12.13)
+LinkingTo: Rcpp, BH
+Suggests: 
+    knitr,
+    rmarkdown
+VignetteBuilder: knitr

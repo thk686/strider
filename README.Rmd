@@ -1,0 +1,6 @@
+---
+title: "Strider"
+author: "Timothy H. Keitt"
+output: github_document
+---
+
