@@ -67,6 +67,7 @@ An alternative to for-loops are the C++ standard library algorithms. These are g
 ```{Rcpp}
 // [[Rcpp::plugins(cpp11)]]
 // [[Rcpp::depends(strider)]]
+// [[Rcpp::depends(BH)]]
 
 #include <Rcpp.h>
 using Rcpp::NumericVector;
@@ -154,8 +155,9 @@ print(mb, order = "median", signif = 3)
 As before, we can reimplement using **strider** and the standard library algorithms. A naive implementation will stride over the rows, then columns.
 
 ```{Rcpp}
-// [[Rcpp::plugins(cpp11)]]
+// [[Rcpp::depends(BH)]]
 // [[Rcpp::depends(strider)]]
+// [[Rcpp::plugins(cpp11)]]
 
 #include <Rcpp.h>
 using Rcpp::NumericVector;
@@ -203,8 +205,9 @@ The results are not bad, nearly matching the timing of R's built-in ```rowSums``
 An optimal version of this algorithm would iterate over the matrix in column-major order to avoid non-sequential memory access. For that, we need the binary-function version of ```transform```.
 
 ```{Rcpp}
-// [[Rcpp::plugins(cpp11)]]
+// [[Rcpp::depends(BH)]]
 // [[Rcpp::depends(strider)]]
+// [[Rcpp::plugins(cpp11)]]
 
 #include <Rcpp.h>
 using Rcpp::NumericVector;
@@ -267,8 +270,9 @@ autoplot(mb) + theme_classic()
 In addition to ```stri_begin``` and ```stri_end```, **strider** provides a strided range for range-based for-loops.
 
 ```{Rcpp}
-// [[Rcpp::plugins(cpp11)]]
+// [[Rcpp::depends(BH)]]
 // [[Rcpp::depends(strider)]]
+// [[Rcpp::plugins(cpp11)]]
 
 #include <Rcpp.h>
 using Rcpp::wrap;
