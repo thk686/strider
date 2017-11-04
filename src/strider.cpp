@@ -29,7 +29,7 @@ using strider::stri_end;
 NumericVector row_sums(const NumericMatrix& x)
 {
   auto
-  nr = x.nrow(),
+    nr = x.nrow(),
     nc = x.ncol();
   NumericVector res(nr, 0.0);
   auto data = &x[0];
@@ -53,7 +53,7 @@ NumericVector row_sums(const NumericMatrix& x)
 NumericVector col_sums(const NumericMatrix& x)
 {
   auto
-  nr = x.nrow(),
+    nr = x.nrow(),
     nc = x.ncol();
   auto data = &x[0];
   NumericVector res(nc);
