@@ -6,44 +6,32 @@
 
 using namespace Rcpp;
 
-// test_row_sum
-NumericVector test_row_sum(NumericMatrix& x);
-RcppExport SEXP _strider_test_row_sum(SEXP xSEXP) {
+// row_sums
+NumericVector row_sums(const NumericMatrix& x);
+RcppExport SEXP _strider_row_sums(SEXP xSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< NumericMatrix& >::type x(xSEXP);
-    rcpp_result_gen = Rcpp::wrap(test_row_sum(x));
+    Rcpp::traits::input_parameter< const NumericMatrix& >::type x(xSEXP);
+    rcpp_result_gen = Rcpp::wrap(row_sums(x));
     return rcpp_result_gen;
 END_RCPP
 }
-// test_row_sum2
-NumericVector test_row_sum2(NumericMatrix& x);
-RcppExport SEXP _strider_test_row_sum2(SEXP xSEXP) {
+// col_sums
+NumericVector col_sums(const NumericMatrix& x);
+RcppExport SEXP _strider_col_sums(SEXP xSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< NumericMatrix& >::type x(xSEXP);
-    rcpp_result_gen = Rcpp::wrap(test_row_sum2(x));
-    return rcpp_result_gen;
-END_RCPP
-}
-// test_col_sum
-NumericVector test_col_sum(NumericMatrix& x);
-RcppExport SEXP _strider_test_col_sum(SEXP xSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< NumericMatrix& >::type x(xSEXP);
-    rcpp_result_gen = Rcpp::wrap(test_col_sum(x));
+    Rcpp::traits::input_parameter< const NumericMatrix& >::type x(xSEXP);
+    rcpp_result_gen = Rcpp::wrap(col_sums(x));
     return rcpp_result_gen;
 END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
-    {"_strider_test_row_sum", (DL_FUNC) &_strider_test_row_sum, 1},
-    {"_strider_test_row_sum2", (DL_FUNC) &_strider_test_row_sum2, 1},
-    {"_strider_test_col_sum", (DL_FUNC) &_strider_test_col_sum, 1},
+    {"_strider_row_sums", (DL_FUNC) &_strider_row_sums, 1},
+    {"_strider_col_sums", (DL_FUNC) &_strider_col_sums, 1},
     {NULL, NULL, 0}
 };
 

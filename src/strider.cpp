@@ -1,66 +1,64 @@
-#include <Rcpp.h>
+// [[Rcpp::plugins(cpp11)]]
 
-using Rcpp::Rcout;
+#include <Rcpp.h>
 using Rcpp::NumericVector;
 using Rcpp::NumericMatrix;
-
-// [[Rcpp::plugins(cpp11)]]
-// [[Rcpp::depends(BH)]]
-
-#include <vector>
-#include <iostream>
 #include <algorithm>
-
-using std::vector;
-using std::accumulate;
-using std::transform;
 using std::for_each;
-
+using std::transform;
+using std::accumulate;
 #include <strider.h>
 using strider::stri_begin;
 using strider::stri_end;
 
-// [[Rcpp::export]]
-NumericVector test_row_sum(NumericMatrix& x)
-{
-  auto
-    nr = x.nrow(),
-    nc = x.ncol();
-  auto data = &x[0];
-  NumericVector res(nr);
-  transform(data, data + nr, &res[0], [=](const double& v){
-    return accumulate(stri_begin(&v, nr), stri_end(&v, nr, nc), 0.0); });
-  return res;
-}
 
+//' Fast row sums
+//' 
+//' Very fast row sums
+//' 
+//' @param x a numeric matrix
+//' 
+//' @details A very efficient row summing algorithm that demonstrates
+//' the use of the strided pointer concept. The \code{row_sum} algorithm is
+//' roughly twice as fast as \code{\link{rowSums}}. The \code{col_sum} algorithm 
+//' matches \code{\link{colSums}} for speed.
+//'
+//' @rdname sums
+//' @export
 // [[Rcpp::export]]
-NumericVector test_row_sum2(NumericMatrix& x)
+NumericVector row_sums(const NumericMatrix& x)
 {
   auto
-    nr = x.nrow(),
+  nr = x.nrow(),
     nc = x.ncol();
   NumericVector res(nr, 0.0);
-  auto
-    data = &x[0],
-    rptr = &res[0];
+  auto data = &x[0];
+  auto rptr = &res[0];
   for_each(stri_begin(data, nr),
            stri_end(data, nr, nc),
-           [=](const double& x){
+           [&](const double& x){
              transform(&x, &x + nr, rptr, rptr,
                        [](const double& a, const double& b){
                          return a + b; });});
   return res;
 }
 
+//' Fast column sums
+//' 
+//' Column sums using C++ standard library and strider
+//' 
+//' @rdname sums
+//' @export
 // [[Rcpp::export]]
-NumericVector test_col_sum(NumericMatrix& x)
+NumericVector col_sums(const NumericMatrix& x)
 {
   auto
-    nr = x.nrow(),
+  nr = x.nrow(),
     nc = x.ncol();
   auto data = &x[0];
   NumericVector res(nc);
   transform(stri_begin(data, nr), stri_end(data, nr, nc), &res[0],
-            [=](const double& v){ return accumulate(&v, &v + nr, 0.0); });
+            [&](const double& v){ return accumulate(&v, &v + nr, 0.0); });
   return res;
 }
+
