@@ -21,7 +21,7 @@ The **strided_pointer** template is as minimalist as possible. It inherits from 
 
 ## Usage
 
-The **strided_pointer** and related functions are designed to be used in C++ code. I first create a header to avoid some repetitive code declarations.
+The **strided_pointer** and related functions are designed to be used in C++ code. I first create a header to avoid some repetitive code declarations. Unfortunately, Rcpp attributes cannot be used in a header. The dependency on BH below is only to fix a problem with Travis CI.
 
 ```{r}
 header_code = '
@@ -60,7 +60,7 @@ Sys.setenv(PKG_CPPFLAGS = pkg_cppflags)
 As a minimal example, consider computing the column sums of a matrix. Many authors familiar with R or C would implement this using for-loops.
 
 ```{Rcpp}
-// [[Rcpp::depends(BH)]]           /* only needed for Travis CI */
+// [[Rcpp::depends(BH)]]
 // [[Rcpp::depends(strider)]]
 // [[Rcpp::plugins(cpp11)]]
 
