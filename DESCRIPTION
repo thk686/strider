@@ -13,7 +13,8 @@ Suggests:
     knitr,
     rmarkdown,
     testthat,
-    microbenchmark
+    microbenchmark,
+    covr
 VignetteBuilder: knitr
 URL: https://github.com/thk686/strider
 BugReports: https://github.com/thk686/strider/issues

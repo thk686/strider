@@ -371,6 +371,8 @@ void stri_loop_range_3(const IntegerVector& a)
 }
 ```
 
+Properly constructed, the stride should diminish with each added inner-loop to optimize memory locality.
+
 ```{r}
 x = 1:(2 * 2 * 2)
 dim(x) = c(2, 2, 2)
