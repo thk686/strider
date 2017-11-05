@@ -21,25 +21,60 @@ The **strided_pointer** template is as minimalist as possible. It inherits from 
 
 ## Usage
 
-The **strided_pointer** and related functions are designed to be used in C++ code. 
+The **strided_pointer** and related functions are designed to be used in C++ code. I first create a header to avoid some repetitive code declarations.
+
+```{r}
+header_code = '
+#include <Rcpp.h>
+using Rcpp::stop;
+using Rcpp::IntegerVector;
+using Rcpp::NumericVector;
+using Rcpp::NumericMatrix;
+using Rcpp::Dimension;
+using Rcpp::Rcout;
+using Rcpp::wrap;
+
+#include <strider.h>
+using strider::make_stri_range;
+using strider::stri_begin;
+using strider::stri_end;
+
+#include <algorithm>
+using std::accumulate;
+using std::transform;
+using std::for_each;
+
+#include <vector>
+using std::vector;
+'
+
+header_file = "vignette.h"
+cat(header_code, file = file.path(tempdir(), header_file))
+pkg_cppflags = Sys.getenv("PKG_CPPFLAGS")
+pkg_cppflags = paste(pkg_cppflags, paste0("-I\"", tempdir(), "\""))
+Sys.setenv(PKG_CPPFLAGS = pkg_cppflags)
+```
 
 ### Column sums
 
 As a minimal example, consider computing the column sums of a matrix. Many authors familiar with R or C would implement this using for-loops.
 
 ```{Rcpp}
+// [[Rcpp::depends(BH)]]           /* only needed for Travis CI */
+// [[Rcpp::depends(strider)]]
 // [[Rcpp::plugins(cpp11)]]
 
-#include <Rcpp.h>
-using Rcpp::NumericVector;
-using Rcpp::NumericMatrix;
+#include <vignette.h>
 
 // [[Rcpp::export]]
 NumericVector indx_col_sum(const NumericMatrix& x)
 {
-  NumericVector res(x.ncol(), 0.0);
-  for (int c = 0; c != x.ncol(); ++c)
-    for (int r = 0; r != x.nrow(); ++r)
+  auto
+    nr = x.nrow(),
+    nc = x.ncol();
+  NumericVector res(nc, 0.0);
+  for (int c = 0; c != nc; ++c)
+    for (int r = 0; r != nr; ++r)
       res(c) += x(r, c);
   return res;
 }
@@ -53,31 +88,23 @@ if (!identical(indx_col_sum(x), colSums(x)))
 */
 ```
 
-This code is suboptimal for a number of reasons. Every loop iteration requires exit-condition checking and each vector and matrix access requires computing pointer offsets into the underlying buffer. The results below show that this implementation is much slower than R's built-in ```colSums``` function.
+This code is suboptimal for a number of reasons. For one, each vector and matrix access requires computing pointer offsets into the underlying buffer. The results below show that this implementation is much slower than R's built-in ```colSums``` function.
 
 ```{r}
 library(microbenchmark)
 x = matrix(rnorm(1e6), 1e3)
 mb = microbenchmark(colSums(x), indx_col_sum(x))
-print(mb, order = "median", signif = 3)
+print(mb, "ms", "median", 2)
 ```
 
 An alternative to for-loops are the C++ standard library algorithms. These are generally difficult to use with multidimensional data. This is why I wrote **strider**. For multidimensional data, we need to iterate over the columns, then the rows. To do this, we construct a **strided_pointer** that skips to the first element of each column. From there, we can accumulate the values easily. The standard library algorithms required are ```transform``` and ```accumulate```. 
 
 ```{Rcpp}
-// [[Rcpp::plugins(cpp11)]]
-// [[Rcpp::depends(strider)]]
 // [[Rcpp::depends(BH)]]
+// [[Rcpp::depends(strider)]]
+// [[Rcpp::plugins(cpp11)]]
 
-#include <Rcpp.h>
-using Rcpp::NumericVector;
-using Rcpp::NumericMatrix;
-#include <algorithm>
-using std::accumulate;
-using std::transform;
-#include <strider.h>
-using strider::stri_begin;
-using strider::stri_end;
+#include <vignette.h>
 
 // [[Rcpp::export]]
 NumericVector stri_col_sum(const NumericMatrix& x)
@@ -106,7 +133,7 @@ The main functions above are ```stri_begin``` and ```stri_end```, which create s
 ```{r}
 x = matrix(rnorm(1e6), 1e3)
 mb = microbenchmark(colSums(x), indx_col_sum(x), stri_col_sum(x))
-print(mb, order = "median", signif = 3)
+print(mb, "ms", "median", 2)
 ```
 
 This version is in a dead-heat with the built-in ```colSums``` function.
@@ -118,18 +145,21 @@ Summing over rows is more interesting because R matrices are stored in column-ma
 Again, we can implement in terms of for-loops with a slight change.
 
 ```{Rcpp}
+// [[Rcpp::depends(BH)]]
+// [[Rcpp::depends(strider)]]
 // [[Rcpp::plugins(cpp11)]]
 
-#include <Rcpp.h>
-using Rcpp::NumericVector;
-using Rcpp::NumericMatrix;
+#include <vignette.h>
 
 // [[Rcpp::export]]
 NumericVector indx_row_sum(const NumericMatrix& x)
 {
-  NumericVector res(x.nrow(), 0.0);
-  for (int c = 0; c != x.ncol(); ++c)
-    for (int r = 0; r != x.nrow(); ++r)
+  auto
+    nr = x.nrow(),
+    nc = x.ncol();
+  NumericVector res(nr, 0.0);
+  for (int c = 0; c != nc; ++c)
+    for (int r = 0; r != nr; ++r)
       res(r) += x(r, c);
   return res;
 }
@@ -147,9 +177,8 @@ We are still looping over columns first, which is more efficient, yet this is st
  
 ```{r}
 x = matrix(rnorm(1e6), 1e3)
-mb = microbenchmark(colSums(x), indx_col_sum(x), stri_col_sum(x),
-                    rowSums(x), indx_row_sum(x))
-print(mb, order = "median", signif = 3)
+mb = microbenchmark(rowSums(x), indx_row_sum(x))
+print(mb, "ms", "median", 2)
 ```
 
 As before, we can reimplement using **strider** and the standard library algorithms. A naive implementation will stride over the rows, then columns.
@@ -159,15 +188,7 @@ As before, we can reimplement using **strider** and the standard library algorit
 // [[Rcpp::depends(strider)]]
 // [[Rcpp::plugins(cpp11)]]
 
-#include <Rcpp.h>
-using Rcpp::NumericVector;
-using Rcpp::NumericMatrix;
-#include <algorithm>
-using std::accumulate;
-using std::transform;
-#include <strider.h>
-using strider::stri_begin;
-using strider::stri_end;
+#include <vignette.h>
 
 // [[Rcpp::export]]
 NumericVector stri_row_sum(const NumericMatrix& x)
@@ -194,13 +215,11 @@ if (!identical(stri_row_sum(x), rowSums(x)))
 While this code is compact, notice that the strided pointer is in the inner loop. This non-sequential memory access will slow down the algorithm.
 
 ```{r}
-mb = microbenchmark(stri_col_sum(x), colSums(x),
-                    stri_row_sum(x), rowSums(x),
-                    indx_row_sum(x), indx_col_sum(x))
-print(mb, order = "median", signif = 3)
+mb = microbenchmark(stri_row_sum(x), rowSums(x), indx_row_sum(x))
+print(mb, "ms", "median", 2)
 ```
 
-The results are not bad, nearly matching the timing of R's built-in ```rowSums```, but twice as slow as summing columns owing to the skipping over rows.
+The results are not bad, matching the timing of R's built-in ```rowSums```, but is still twice as slow as summing columns owing to the skipping over rows.
 
 An optimal version of this algorithm would iterate over the matrix in column-major order to avoid non-sequential memory access. For that, we need the binary-function version of ```transform```.
 
@@ -209,15 +228,7 @@ An optimal version of this algorithm would iterate over the matrix in column-maj
 // [[Rcpp::depends(strider)]]
 // [[Rcpp::plugins(cpp11)]]
 
-#include <Rcpp.h>
-using Rcpp::NumericVector;
-using Rcpp::NumericMatrix;
-#include <algorithm>
-using std::for_each;
-using std::transform;
-#include <strider.h>
-using strider::stri_begin;
-using strider::stri_end;
+#include <vignette.h>
 
 // [[Rcpp::export]]
 NumericVector stri_row_sum2(const NumericMatrix& x)
@@ -246,22 +257,70 @@ if (!identical(stri_row_sum2(x), rowSums(x)))
 */
 ```
 
-This code is similar to the column summing algorithm in that the inner loop is sequential access. The outer loop jumps to the top of each column, while the inner loop scans the rows and adds the values to the result vector.
+This code is similar to the column summing algorithm in that the inner loop is sequential access. The outer ```for_each``` loop jumps to the top of each column, while the inner ```transform``` loop scans the rows and adds the values to the running sums stored in the result vector.
 
 ```{r}
-mb = microbenchmark(stri_col_sum(x), colSums(x),
-                    stri_row_sum(x), rowSums(x),
-                    indx_row_sum(x), indx_col_sum(x),
-                    stri_row_sum2(x))
-print(mb, order = "median", signif = 3)
+mb = microbenchmark(stri_row_sum(x), rowSums(x),
+                    indx_row_sum(x), stri_row_sum2(x))
+print(mb, "ms", "median", 2)
 ```
 
-The speed-up is quite remarkable, roughly three times faster than R's native ```rowSums``` and even faster than R's built-in ```colSums``` function. The performance is due to excellent locality. The matrix is scanned along successive memory locations.
+The speed-up is quite remarkable, roughly three times faster than R's native ```rowSums``` and even faster than R's built-in ```colSums``` function. The performance is due to excellent locality and, perhaps, the ```for_each``` loop was unrolled by the compiler. Notice that the inner-loop ends exactly at the next position of the outer-loop, perhaps allowing some additional optimization.
 
 Experimenting with this code suggests that lambda capture-by-value versus capture-by-reference has no impact on performance. However, using pass-by-value for the lambda arguments causes a dramatic slowdown. This is undoubtedly an issue with function inlining or other compiler optimizations.
 
+We might be curious whether it is possible increase the efficiency of the column summing to match the result for our transform-based row sum algorithm. We can trick ```transform``` into accumulating using a 0-stride iterator.
+
+```{Rcpp}
+// [[Rcpp::depends(BH)]]
+// [[Rcpp::depends(strider)]]
+// [[Rcpp::plugins(cpp11)]]
+
+#include <vignette.h>
+
+// [[Rcpp::export]]
+NumericVector stri_col_sum2(const NumericMatrix& x)
+{
+  auto
+    nr = x.nrow(),
+    nc = x.ncol();
+  NumericVector res(nc, 0.0);
+  auto data = &x[0];
+  auto rptr = &res[0];
+  transform(stri_begin(data, nr), stri_end(data, nr, nc), rptr, rptr,
+            [&](const double& x, double& y){
+              transform(&x, &x + nr, stri_begin(&y, 0), stri_begin(&y, 0),
+                        [](const double& a, const double& b){
+                          return a + b; });
+              return y; });
+  return res;
+}
+
+/*** R
+local({
+x = matrix(1:1e4, 1e2)
+if (!identical(stri_col_sum2(x), colSums(x)))
+  stop("stri_col_sum2 is incorrect")
+})
+*/
+```
+
+The 0-stride iterator uses ```y``` to accumulate the column sum and this is returned and assigned to ```rptr```, which is iterated forward for each column.
+
+```{r}
+mb = microbenchmark(colSums(x), indx_col_sum(x),
+                    stri_col_sum(x), stri_col_sum2(x))
+print(mb, "ms", "median", 2)
+```
+
+This version is no more efficient than the ```accumulate``` version. Perhaps there is something intrinsicly faster about row sums, or, more likely, the compiler handles ```for_each``` very efficiently. Figure 1. plots the observed runtimes for comparison.
+
+
 ```{r fig.width = 6, fig.height = 4}
 library(ggplot2)
+mb = microbenchmark(stri_row_sum2(x), stri_row_sum(x), rowSums(x),
+                    colSums(x), stri_col_sum(x), stri_col_sum2(x),
+                    indx_row_sum(x), indx_col_sum(x))
 autoplot(mb) + theme_classic()
 ```
 
@@ -274,19 +333,13 @@ In addition to ```stri_begin``` and ```stri_end```, **strider** provides a strid
 // [[Rcpp::depends(strider)]]
 // [[Rcpp::plugins(cpp11)]]
 
-#include <Rcpp.h>
-using Rcpp::wrap;
-using Rcpp::IntegerVector;
-#include <vector>
-using std::vector;
-#include <strider.h>
-using strider::make_stri_range;
+#include <vignette.h>
 
 // [[Rcpp::export]]
 SEXP stri_nth_values(const IntegerVector& x, int stride, int strides)
 {
   vector<int> res;
-  for (auto v : make_stri_range(&x[0], stride, strides)) res.push_back(v);
+  for (auto&& v : make_stri_range(&x[0], stride, strides)) res.push_back(v);
   return wrap(res);
 }
 ```
@@ -295,6 +348,33 @@ The ```make_stri_range``` simply encapsulates calls to ```stri_begin``` and ```s
 
 ```{r}
 stri_nth_values(1:1000, 21, 11)
+```
+
+A strided range can be used to loop over all elements of an arbitrarily dimensioned array with extents only known at runtime.
+
+```{Rcpp}
+// [[Rcpp::depends(BH)]]
+// [[Rcpp::depends(strider)]]
+// [[Rcpp::plugins(cpp11)]]
+
+#include <vignette.h>
+
+// [[Rcpp::export]]
+void stri_loop_range_3(const IntegerVector& a)
+{
+  IntegerVector d = a.attr("dim");
+  if (d.size() != 3) stop("Expecting 3D array");
+  for (auto&& x : make_stri_range(&a[0], d[1] * d[2], d[0]))
+    for (auto&& y : make_stri_range(&x, d[2], d[1]))
+      for (auto&& z : make_stri_range(&y, 1, d[2]))
+        Rcout << x << " " << y << " " << z << std::endl;
+}
+```
+
+```{r}
+x = 1:(2 * 2 * 2)
+dim(x) = c(2, 2, 2)
+stri_loop_range_3(x)
 ```
 
 ## Conclusions

@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+
+<meta charset="utf-8" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="pandoc" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<meta name="author" content="Timothy H. Keitt" />
+
+<meta name="date" content="2017-11-05" />
+
+<title>The Strider Package</title>
+
+
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css">
+div.sourceCode { overflow-x: auto; }
+table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+  margin: 0; padding: 0; vertical-align: baseline; border: none; }
+table.sourceCode { width: 100%; line-height: 100%; }
+td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
+td.sourceCode { padding-left: 5px; }
+code > span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code > span.dt { color: #902000; } /* DataType */
+code > span.dv { color: #40a070; } /* DecVal */
+code > span.bn { color: #40a070; } /* BaseN */
+code > span.fl { color: #40a070; } /* Float */
+code > span.ch { color: #4070a0; } /* Char */
+code > span.st { color: #4070a0; } /* String */
+code > span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code > span.ot { color: #007020; } /* Other */
+code > span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code > span.fu { color: #06287e; } /* Function */
+code > span.er { color: #ff0000; font-weight: bold; } /* Error */
+code > span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+code > span.cn { color: #880000; } /* Constant */
+code > span.sc { color: #4070a0; } /* SpecialChar */
+code > span.vs { color: #4070a0; } /* VerbatimString */
+code > span.ss { color: #bb6688; } /* SpecialString */
+code > span.im { } /* Import */
+code > span.va { color: #19177c; } /* Variable */
+code > span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code > span.op { color: #666666; } /* Operator */
+code > span.bu { } /* BuiltIn */
+code > span.ex { } /* Extension */
+code > span.pp { color: #bc7a00; } /* Preprocessor */
+code > span.at { color: #7d9029; } /* Attribute */
+code > span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code > span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code > span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+</style>
+
+
+
+<link href="data:text/css;charset=utf-8,body%20%7B%0Abackground%2Dcolor%3A%20%23fff%3B%0Amargin%3A%201em%20auto%3B%0Amax%2Dwidth%3A%20700px%3B%0Aoverflow%3A%20visible%3B%0Apadding%2Dleft%3A%202em%3B%0Apadding%2Dright%3A%202em%3B%0Afont%2Dfamily%3A%20%22Open%20Sans%22%2C%20%22Helvetica%20Neue%22%2C%20Helvetica%2C%20Arial%2C%20sans%2Dserif%3B%0Afont%2Dsize%3A%2014px%3B%0Aline%2Dheight%3A%201%2E35%3B%0A%7D%0A%23header%20%7B%0Atext%2Dalign%3A%20center%3B%0A%7D%0A%23TOC%20%7B%0Aclear%3A%20both%3B%0Amargin%3A%200%200%2010px%2010px%3B%0Apadding%3A%204px%3B%0Awidth%3A%20400px%3B%0Aborder%3A%201px%20solid%20%23CCCCCC%3B%0Aborder%2Dradius%3A%205px%3B%0Abackground%2Dcolor%3A%20%23f6f6f6%3B%0Afont%2Dsize%3A%2013px%3B%0Aline%2Dheight%3A%201%2E3%3B%0A%7D%0A%23TOC%20%2Etoctitle%20%7B%0Afont%2Dweight%3A%20bold%3B%0Afont%2Dsize%3A%2015px%3B%0Amargin%2Dleft%3A%205px%3B%0A%7D%0A%23TOC%20ul%20%7B%0Apadding%2Dleft%3A%2040px%3B%0Amargin%2Dleft%3A%20%2D1%2E5em%3B%0Amargin%2Dtop%3A%205px%3B%0Amargin%2Dbottom%3A%205px%3B%0A%7D%0A%23TOC%20ul%20ul%20%7B%0Amargin%2Dleft%3A%20%2D2em%3B%0A%7D%0A%23TOC%20li%20%7B%0Aline%2Dheight%3A%2016px%3B%0A%7D%0Atable%20%7B%0Amargin%3A%201em%20auto%3B%0Aborder%2Dwidth%3A%201px%3B%0Aborder%2Dcolor%3A%20%23DDDDDD%3B%0Aborder%2Dstyle%3A%20outset%3B%0Aborder%2Dcollapse%3A%20collapse%3B%0A%7D%0Atable%20th%20%7B%0Aborder%2Dwidth%3A%202px%3B%0Apadding%3A%205px%3B%0Aborder%2Dstyle%3A%20inset%3B%0A%7D%0Atable%20td%20%7B%0Aborder%2Dwidth%3A%201px%3B%0Aborder%2Dstyle%3A%20inset%3B%0Aline%2Dheight%3A%2018px%3B%0Apadding%3A%205px%205px%3B%0A%7D%0Atable%2C%20table%20th%2C%20table%20td%20%7B%0Aborder%2Dleft%2Dstyle%3A%20none%3B%0Aborder%2Dright%2Dstyle%3A%20none%3B%0A%7D%0Atable%20thead%2C%20table%20tr%2Eeven%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0A%7D%0Ap%20%7B%0Amargin%3A%200%2E5em%200%3B%0A%7D%0Ablockquote%20%7B%0Abackground%2Dcolor%3A%20%23f6f6f6%3B%0Apadding%3A%200%2E25em%200%2E75em%3B%0A%7D%0Ahr%20%7B%0Aborder%2Dstyle%3A%20solid%3B%0Aborder%3A%20none%3B%0Aborder%2Dtop%3A%201px%20solid%20%23777%3B%0Amargin%3A%2028px%200%3B%0A%7D%0Adl%20%7B%0Amargin%2Dleft%3A%200%3B%0A%7D%0Adl%20dd%20%7B%0Amargin%2Dbottom%3A%2013px%3B%0Amargin%2Dleft%3A%2013px%3B%0A%7D%0Adl%20dt%20%7B%0Afont%2Dweight%3A%20bold%3B%0A%7D%0Aul%20%7B%0Amargin%2Dtop%3A%200%3B%0A%7D%0Aul%20li%20%7B%0Alist%2Dstyle%3A%20circle%20outside%3B%0A%7D%0Aul%20ul%20%7B%0Amargin%2Dbottom%3A%200%3B%0A%7D%0Apre%2C%20code%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0Aborder%2Dradius%3A%203px%3B%0Acolor%3A%20%23333%3B%0Awhite%2Dspace%3A%20pre%2Dwrap%3B%20%0A%7D%0Apre%20%7B%0Aborder%2Dradius%3A%203px%3B%0Amargin%3A%205px%200px%2010px%200px%3B%0Apadding%3A%2010px%3B%0A%7D%0Apre%3Anot%28%5Bclass%5D%29%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0A%7D%0Acode%20%7B%0Afont%2Dfamily%3A%20Consolas%2C%20Monaco%2C%20%27Courier%20New%27%2C%20monospace%3B%0Afont%2Dsize%3A%2085%25%3B%0A%7D%0Ap%20%3E%20code%2C%20li%20%3E%20code%20%7B%0Apadding%3A%202px%200px%3B%0A%7D%0Adiv%2Efigure%20%7B%0Atext%2Dalign%3A%20center%3B%0A%7D%0Aimg%20%7B%0Abackground%2Dcolor%3A%20%23FFFFFF%3B%0Apadding%3A%202px%3B%0Aborder%3A%201px%20solid%20%23DDDDDD%3B%0Aborder%2Dradius%3A%203px%3B%0Aborder%3A%201px%20solid%20%23CCCCCC%3B%0Amargin%3A%200%205px%3B%0A%7D%0Ah1%20%7B%0Amargin%2Dtop%3A%200%3B%0Afont%2Dsize%3A%2035px%3B%0Aline%2Dheight%3A%2040px%3B%0A%7D%0Ah2%20%7B%0Aborder%2Dbottom%3A%204px%20solid%20%23f7f7f7%3B%0Apadding%2Dtop%3A%2010px%3B%0Apadding%2Dbottom%3A%202px%3B%0Afont%2Dsize%3A%20145%25%3B%0A%7D%0Ah3%20%7B%0Aborder%2Dbottom%3A%202px%20solid%20%23f7f7f7%3B%0Apadding%2Dtop%3A%2010px%3B%0Afont%2Dsize%3A%20120%25%3B%0A%7D%0Ah4%20%7B%0Aborder%2Dbottom%3A%201px%20solid%20%23f7f7f7%3B%0Amargin%2Dleft%3A%208px%3B%0Afont%2Dsize%3A%20105%25%3B%0A%7D%0Ah5%2C%20h6%20%7B%0Aborder%2Dbottom%3A%201px%20solid%20%23ccc%3B%0Afont%2Dsize%3A%20105%25%3B%0A%7D%0Aa%20%7B%0Acolor%3A%20%230033dd%3B%0Atext%2Ddecoration%3A%20none%3B%0A%7D%0Aa%3Ahover%20%7B%0Acolor%3A%20%236666ff%3B%20%7D%0Aa%3Avisited%20%7B%0Acolor%3A%20%23800080%3B%20%7D%0Aa%3Avisited%3Ahover%20%7B%0Acolor%3A%20%23BB00BB%3B%20%7D%0Aa%5Bhref%5E%3D%22http%3A%22%5D%20%7B%0Atext%2Ddecoration%3A%20underline%3B%20%7D%0Aa%5Bhref%5E%3D%22https%3A%22%5D%20%7B%0Atext%2Ddecoration%3A%20underline%3B%20%7D%0A%0Acode%20%3E%20span%2Ekw%20%7B%20color%3A%20%23555%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%0Acode%20%3E%20span%2Edt%20%7B%20color%3A%20%23902000%3B%20%7D%20%0Acode%20%3E%20span%2Edv%20%7B%20color%3A%20%2340a070%3B%20%7D%20%0Acode%20%3E%20span%2Ebn%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Efl%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Ech%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Est%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Eco%20%7B%20color%3A%20%23888888%3B%20font%2Dstyle%3A%20italic%3B%20%7D%20%0Acode%20%3E%20span%2Eot%20%7B%20color%3A%20%23007020%3B%20%7D%20%0Acode%20%3E%20span%2Eal%20%7B%20color%3A%20%23ff0000%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%0Acode%20%3E%20span%2Efu%20%7B%20color%3A%20%23900%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%20code%20%3E%20span%2Eer%20%7B%20color%3A%20%23a61717%3B%20background%2Dcolor%3A%20%23e3d2d2%3B%20%7D%20%0A" rel="stylesheet" type="text/css" />
+
+</head>
+
+<body>
+
+
+
+
+<h1 class="title toc-ignore">The Strider Package</h1>
+<h4 class="author"><em>Timothy H. Keitt</em></h4>
+<h4 class="date"><em>2017-11-05</em></h4>
+
+
+
+<p>“I don’t think he knows about second breakfast” - Meriadoc ‘Merry’ Brandybuck</p>
+<div id="introduction" class="section level2">
+<h2>Introduction</h2>
+<p>The <strong>strider</strong> package implements a pointer-based strided iterator for use with legacy buffers. It is implemented as a stand-alone C++11 header that depends on the <a href="http://en.cppreference.com/w/">C++ standard library</a> and <a href="http://www.boost.org/doc/libs/release/libs/iterator/">Boost iterator facade</a>. The <strong>strided_pointer</strong> iterator class and associated functions allow adaptation of multidimensional arrays for use with iterator-based algorithms. Although packaged with R, the header file can be used independently of R. Please provide the appropriate citation in any event.</p>
+</div>
+<div id="implementation" class="section level2">
+<h2>Implementation</h2>
+<p>The <strong>strided_pointer</strong> template is as minimalist as possible. It inherits from Boost’s <strong>iterator_facade</strong> and holds only a pointer to the template type and a stride. Upon specialization, <strong>strided_pointer</strong> conforms to the <strong>RandomAccessIterator</strong> concept. It is currently possible to specify negative strides, however this is not tested.</p>
+</div>
+<div id="usage" class="section level2">
+<h2>Usage</h2>
+<p>The <strong>strided_pointer</strong> and related functions are designed to be used in C++ code.</p>
+<div id="column-sums" class="section level3">
+<h3>Column sums</h3>
+<p>As a minimal example, consider computing the column sums of a matrix. Many authors familiar with R or C would implement this using for-loops.</p>
+<div class="sourceCode"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span class="co">// [[Rcpp::plugins(cpp11)]]</span>
+
+<span class="pp">#include </span><span class="im">&lt;Rcpp.h&gt;</span>
+<span class="kw">using</span> Rcpp::NumericVector;
+<span class="kw">using</span> Rcpp::NumericMatrix;
+
+<span class="co">// [[Rcpp::export]]</span>
+NumericVector indx_col_sum(<span class="at">const</span> NumericMatrix&amp; x)
+{
+  NumericVector res(x.ncol(), <span class="fl">0.0</span>);
+  <span class="cf">for</span> (<span class="dt">int</span> c = <span class="dv">0</span>; c != x.ncol(); ++c)
+    <span class="cf">for</span> (<span class="dt">int</span> r = <span class="dv">0</span>; r != x.nrow(); ++r)
+      res(c) += x(r, c);
+  <span class="cf">return</span> res;
+}
+
+<span class="co">/*** R</span>
+<span class="co">local({</span>
+<span class="co">x = matrix(1:1e4, 1e2)</span>
+<span class="co">if (!identical(indx_col_sum(x), colSums(x)))</span>
+<span class="co">  stop(&quot;indx_col_sum is incorrect&quot;)</span>
+<span class="co">})</span>
+<span class="co">*/</span></code></pre></div>
+<p>This code is suboptimal for a number of reasons. Every loop iteration requires exit-condition checking and each vector and matrix access requires computing pointer offsets into the underlying buffer. The results below show that this implementation is much slower than R’s built-in <code>colSums</code> function.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(microbenchmark)
+x =<span class="st"> </span><span class="kw">matrix</span>(<span class="kw">rnorm</span>(<span class="fl">1e6</span>), <span class="fl">1e3</span>)
+mb =<span class="st"> </span><span class="kw">microbenchmark</span>(<span class="kw">colSums</span>(x), <span class="kw">indx_col_sum</span>(x))
+<span class="kw">print</span>(mb, <span class="dt">order =</span> <span class="st">&quot;median&quot;</span>, <span class="dt">signif =</span> <span class="dv">3</span>)</code></pre></div>
+<pre><code>## Unit: microseconds
+##             expr  min   lq     mean median   uq   max neval
+##       colSums(x)  947  970 1219.700   1020 1340  2450   100
+##  indx_col_sum(x) 5450 5660 6684.475   6260 7280 11900   100</code></pre>
+<p>An alternative to for-loops are the C++ standard library algorithms. These are generally difficult to use with multidimensional data. This is why I wrote <strong>strider</strong>. For multidimensional data, we need to iterate over the columns, then the rows. To do this, we construct a <strong>strided_pointer</strong> that skips to the first element of each column. From there, we can accumulate the values easily. The standard library algorithms required are <code>transform</code> and <code>accumulate</code>.</p>
+<div class="sourceCode"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span class="co">// [[Rcpp::depends(BH)]]</span>
+<span class="co">// [[Rcpp::depends(strider)]]</span>
+<span class="co">// [[Rcpp::plugins(cpp11)]]</span>
+
+<span class="pp">#include </span><span class="im">&lt;Rcpp.h&gt;</span>
+<span class="kw">using</span> Rcpp::NumericVector;
+<span class="kw">using</span> Rcpp::NumericMatrix;
+<span class="pp">#include </span><span class="im">&lt;algorithm&gt;</span>
+<span class="kw">using</span> <span class="bu">std::</span>accumulate;
+<span class="kw">using</span> <span class="bu">std::</span>transform;
+<span class="pp">#include </span><span class="im">&lt;strider.h&gt;</span>
+<span class="kw">using</span> strider::stri_begin;
+<span class="kw">using</span> strider::stri_end;
+
+<span class="co">// [[Rcpp::export]]</span>
+NumericVector stri_col_sum(<span class="at">const</span> NumericMatrix&amp; x)
+{
+  <span class="kw">auto</span>
+    nr = x.nrow(),
+    nc = x.ncol();
+  <span class="kw">auto</span> data = &amp;x[<span class="dv">0</span>];
+  NumericVector res(nc);
+  transform(stri_begin(data, nr), stri_end(data, nr, nc), &amp;res[<span class="dv">0</span>],
+            [&amp;](<span class="at">const</span> <span class="dt">double</span>&amp; v){ <span class="cf">return</span> accumulate(&amp;v, &amp;v + nr, <span class="fl">0.0</span>); });
+  <span class="cf">return</span> res;
+}
+
+<span class="co">/*** R</span>
+<span class="co">local({</span>
+<span class="co">x = matrix(1:1e4, 1e2)</span>
+<span class="co">if (!identical(stri_col_sum(x), colSums(x)))</span>
+<span class="co">  stop(&quot;stri_col_sum is incorrect&quot;)</span>
+<span class="co">})</span>
+<span class="co">*/</span></code></pre></div>
+<p>The main functions above are <code>stri_begin</code> and <code>stri_end</code>, which create starting and ending iterators over the columns of data. This is a fairly efficient implementation as shown below.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">x =<span class="st"> </span><span class="kw">matrix</span>(<span class="kw">rnorm</span>(<span class="fl">1e6</span>), <span class="fl">1e3</span>)
+mb =<span class="st"> </span><span class="kw">microbenchmark</span>(<span class="kw">colSums</span>(x), <span class="kw">indx_col_sum</span>(x), <span class="kw">stri_col_sum</span>(x))
+<span class="kw">print</span>(mb, <span class="dt">order =</span> <span class="st">&quot;median&quot;</span>, <span class="dt">signif =</span> <span class="dv">3</span>)</code></pre></div>
+<pre><code>## Unit: microseconds
+##             expr  min   lq     mean median   uq   max neval
+##  stri_col_sum(x)  929  934 1091.799    942 1010  2290   100
+##       colSums(x)  946  957 1094.490    973 1060  2410   100
+##  indx_col_sum(x) 5450 5490 6421.356   5560 6090 14500   100</code></pre>
+<p>This version is in a dead-heat with the built-in <code>colSums</code> function.</p>
+</div>
+<div id="row-sums" class="section level3">
+<h3>Row sums</h3>
+<p>Summing over rows is more interesting because R matrices are stored in column-major format. That means that looping over a row will skip from column to column by-passing all the rows in between. This non-local memory access is a drag on performance.</p>
+<p>Again, we can implement in terms of for-loops with a slight change.</p>
+<div class="sourceCode"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span class="co">// [[Rcpp::plugins(cpp11)]]</span>
+
+<span class="pp">#include </span><span class="im">&lt;Rcpp.h&gt;</span>
+<span class="kw">using</span> Rcpp::NumericVector;
+<span class="kw">using</span> Rcpp::NumericMatrix;
+
+<span class="co">// [[Rcpp::export]]</span>
+NumericVector indx_row_sum(<span class="at">const</span> NumericMatrix&amp; x)
+{
+  NumericVector res(x.nrow(), <span class="fl">0.0</span>);
+  <span class="cf">for</span> (<span class="dt">int</span> c = <span class="dv">0</span>; c != x.ncol(); ++c)
+    <span class="cf">for</span> (<span class="dt">int</span> r = <span class="dv">0</span>; r != x.nrow(); ++r)
+      res(r) += x(r, c);
+  <span class="cf">return</span> res;
+}
+
+<span class="co">/*** R</span>
+<span class="co">local({</span>
+<span class="co">x = matrix(1:1e4, 1e2)</span>
+<span class="co">if (!identical(indx_row_sum(x), rowSums(x)))</span>
+<span class="co">  stop(&quot;indx_row_sum is incorrect&quot;)</span>
+<span class="co">})</span>
+<span class="co">*/</span></code></pre></div>
+<p>We are still looping over columns first, which is more efficient, yet this is still a slow implementation.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">x =<span class="st"> </span><span class="kw">matrix</span>(<span class="kw">rnorm</span>(<span class="fl">1e6</span>), <span class="fl">1e3</span>)
+mb =<span class="st"> </span><span class="kw">microbenchmark</span>(<span class="kw">colSums</span>(x), <span class="kw">indx_col_sum</span>(x), <span class="kw">stri_col_sum</span>(x),
+                    <span class="kw">rowSums</span>(x), <span class="kw">indx_row_sum</span>(x))
+<span class="kw">print</span>(mb, <span class="dt">order =</span> <span class="st">&quot;median&quot;</span>, <span class="dt">signif =</span> <span class="dv">3</span>)</code></pre></div>
+<pre><code>## Unit: microseconds
+##             expr  min   lq     mean median   uq   max neval
+##  stri_col_sum(x)  931  937 1008.115    951  995  2230   100
+##       colSums(x)  948  959 1024.364    972 1030  1770   100
+##       rowSums(x) 2010 2040 2223.173   2060 2150  4930   100
+##  indx_col_sum(x) 5450 5480 6042.798   5530 5780 11900   100
+##  indx_row_sum(x) 5440 5510 5942.239   5620 6000 12100   100</code></pre>
+<p>As before, we can reimplement using <strong>strider</strong> and the standard library algorithms. A naive implementation will stride over the rows, then columns.</p>
+<div class="sourceCode"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span class="co">// [[Rcpp::depends(BH)]]</span>
+<span class="co">// [[Rcpp::depends(strider)]]</span>
+<span class="co">// [[Rcpp::plugins(cpp11)]]</span>
+
+<span class="pp">#include </span><span class="im">&lt;Rcpp.h&gt;</span>
+<span class="kw">using</span> Rcpp::NumericVector;
+<span class="kw">using</span> Rcpp::NumericMatrix;
+<span class="pp">#include </span><span class="im">&lt;algorithm&gt;</span>
+<span class="kw">using</span> <span class="bu">std::</span>accumulate;
+<span class="kw">using</span> <span class="bu">std::</span>transform;
+<span class="pp">#include </span><span class="im">&lt;strider.h&gt;</span>
+<span class="kw">using</span> strider::stri_begin;
+<span class="kw">using</span> strider::stri_end;
+
+<span class="co">// [[Rcpp::export]]</span>
+NumericVector stri_row_sum(<span class="at">const</span> NumericMatrix&amp; x)
+{
+  <span class="kw">auto</span>
+    nr = x.nrow(),
+    nc = x.ncol();
+  <span class="kw">auto</span> data = &amp;x[<span class="dv">0</span>];
+  NumericVector res(nr);
+  transform(data, data + nr, &amp;res[<span class="dv">0</span>], [&amp;](<span class="at">const</span> <span class="dt">double</span>&amp; v){
+    <span class="cf">return</span> accumulate(stri_begin(&amp;v, nr), stri_end(&amp;v, nr, nc), <span class="fl">0.0</span>); });
+  <span class="cf">return</span> res;
+}
+
+<span class="co">/*** R</span>
+<span class="co">local({</span>
+<span class="co">x = matrix(1:1e4, 1e2)</span>
+<span class="co">if (!identical(stri_row_sum(x), rowSums(x)))</span>
+<span class="co">  stop(&quot;stri_row_sum is incorrect&quot;)</span>
+<span class="co">})</span>
+<span class="co">*/</span></code></pre></div>
+<p>While this code is compact, notice that the strided pointer is in the inner loop. This non-sequential memory access will slow down the algorithm.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">mb =<span class="st"> </span><span class="kw">microbenchmark</span>(<span class="kw">stri_col_sum</span>(x), <span class="kw">colSums</span>(x),
+                    <span class="kw">stri_row_sum</span>(x), <span class="kw">rowSums</span>(x),
+                    <span class="kw">indx_row_sum</span>(x), <span class="kw">indx_col_sum</span>(x))
+<span class="kw">print</span>(mb, <span class="dt">order =</span> <span class="st">&quot;median&quot;</span>, <span class="dt">signif =</span> <span class="dv">3</span>)</code></pre></div>
+<pre><code>## Unit: microseconds
+##             expr  min   lq     mean median   uq   max neval
+##  stri_col_sum(x)  931  940 1067.097    948 1010  2300   100
+##       colSums(x)  949  962 1082.332    980 1040  2440   100
+##       rowSums(x) 2020 2030 2235.968   2070 2160  5100   100
+##  stri_row_sum(x) 1860 1960 2339.234   2110 2590  4400   100
+##  indx_row_sum(x) 5440 5500 6396.338   5610 6010 12600   100
+##  indx_col_sum(x) 5460 5500 6283.371   5640 6180 12000   100</code></pre>
+<p>The results are not bad, nearly matching the timing of R’s built-in <code>rowSums</code>, but twice as slow as summing columns owing to the skipping over rows.</p>
+<p>An optimal version of this algorithm would iterate over the matrix in column-major order to avoid non-sequential memory access. For that, we need the binary-function version of <code>transform</code>.</p>
+<div class="sourceCode"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span class="co">// [[Rcpp::depends(BH)]]</span>
+<span class="co">// [[Rcpp::depends(strider)]]</span>
+<span class="co">// [[Rcpp::plugins(cpp11)]]</span>
+
+<span class="pp">#include </span><span class="im">&lt;Rcpp.h&gt;</span>
+<span class="kw">using</span> Rcpp::NumericVector;
+<span class="kw">using</span> Rcpp::NumericMatrix;
+<span class="pp">#include </span><span class="im">&lt;algorithm&gt;</span>
+<span class="kw">using</span> <span class="bu">std::</span>for_each;
+<span class="kw">using</span> <span class="bu">std::</span>transform;
+<span class="pp">#include </span><span class="im">&lt;strider.h&gt;</span>
+<span class="kw">using</span> strider::stri_begin;
+<span class="kw">using</span> strider::stri_end;
+
+<span class="co">// [[Rcpp::export]]</span>
+NumericVector stri_row_sum2(<span class="at">const</span> NumericMatrix&amp; x)
+{
+  <span class="kw">auto</span>
+    nr = x.nrow(),
+    nc = x.ncol();
+  NumericVector res(nr, <span class="fl">0.0</span>);
+  <span class="kw">auto</span> data = &amp;x[<span class="dv">0</span>];
+  <span class="kw">auto</span> rptr = &amp;res[<span class="dv">0</span>];
+  for_each(stri_begin(data, nr),
+           stri_end(data, nr, nc),
+           [&amp;](<span class="at">const</span> <span class="dt">double</span>&amp; x){
+             transform(&amp;x, &amp;x + nr, rptr, rptr,
+                       [](<span class="at">const</span> <span class="dt">double</span>&amp; a, <span class="at">const</span> <span class="dt">double</span>&amp; b){
+                         <span class="cf">return</span> a + b; });});
+  <span class="cf">return</span> res;
+}
+
+<span class="co">/*** R</span>
+<span class="co">local({</span>
+<span class="co">x = matrix(1:1e4, 1e2)</span>
+<span class="co">if (!identical(stri_row_sum2(x), rowSums(x)))</span>
+<span class="co">  stop(&quot;stri_row_sum2 is incorrect&quot;)</span>
+<span class="co">})</span>
+<span class="co">*/</span></code></pre></div>
+<p>This code is similar to the column summing algorithm in that the inner loop is sequential access. The outer <code>for_each</code> loop jumps to the top of each column, while the inner <code>transform</code> loop scans the rows and adds the values to the running sums stored in the result vector.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">mb =<span class="st"> </span><span class="kw">microbenchmark</span>(<span class="kw">stri_col_sum</span>(x), <span class="kw">colSums</span>(x),
+                    <span class="kw">stri_row_sum</span>(x), <span class="kw">rowSums</span>(x),
+                    <span class="kw">indx_row_sum</span>(x), <span class="kw">indx_col_sum</span>(x),
+                    <span class="kw">stri_row_sum2</span>(x))
+<span class="kw">print</span>(mb, <span class="dt">order =</span> <span class="st">&quot;median&quot;</span>, <span class="dt">signif =</span> <span class="dv">3</span>)</code></pre></div>
+<pre><code>## Unit: microseconds
+##              expr  min   lq      mean median   uq   max neval
+##  stri_row_sum2(x)  532  571  680.3086    612  683  1620   100
+##   stri_col_sum(x)  929  938 1078.7232    969 1040  2290   100
+##        colSums(x)  946  973 1180.9561   1030 1140  2990   100
+##        rowSums(x) 2010 2050 2385.4503   2140 2260  4990   100
+##   stri_row_sum(x) 1860 2100 2629.2235   2500 2940  5670   100
+##   indx_col_sum(x) 5450 5540 6524.1361   5920 6560 12200   100
+##   indx_row_sum(x) 5450 5610 6591.0602   5930 6910 15400   100</code></pre>
+<p>The speed-up is quite remarkable, roughly three times faster than R’s native <code>rowSums</code> and even faster than R’s built-in <code>colSums</code> function. The performance is due to excellent locality. The matrix is scanned along successive memory locations.</p>
+<p>Experimenting with this code suggests that lambda capture-by-value versus capture-by-reference has no impact on performance. However, using pass-by-value for the lambda arguments causes a dramatic slowdown. This is undoubtedly an issue with function inlining or other compiler optimizations.</p>
+<p>We might be curious whether it is possible increase the efficiency of the column summing to match the result for our transform-based row sum algorithm. We can trick <code>transform</code> into accumulating using a 0-stride iterator.</p>
+<div class="sourceCode"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span class="co">// [[Rcpp::depends(BH)]]</span>
+<span class="co">// [[Rcpp::depends(strider)]]</span>
+<span class="co">// [[Rcpp::plugins(cpp11)]]</span>
+
+<span class="pp">#include </span><span class="im">&lt;Rcpp.h&gt;</span>
+<span class="kw">using</span> Rcpp::NumericVector;
+<span class="kw">using</span> Rcpp::NumericMatrix;
+<span class="pp">#include </span><span class="im">&lt;algorithm&gt;</span>
+<span class="kw">using</span> <span class="bu">std::</span>for_each;
+<span class="kw">using</span> <span class="bu">std::</span>transform;
+<span class="pp">#include </span><span class="im">&lt;strider.h&gt;</span>
+<span class="kw">using</span> strider::stri_begin;
+<span class="kw">using</span> strider::stri_end;
+
+<span class="co">// [[Rcpp::export]]</span>
+NumericVector stri_col_sum2(<span class="at">const</span> NumericMatrix&amp; x)
+{
+  <span class="kw">auto</span>
+    nr = x.nrow(),
+    nc = x.ncol();
+  NumericVector res(nc, <span class="fl">0.0</span>);
+  <span class="kw">auto</span> data = &amp;x[<span class="dv">0</span>];
+  <span class="kw">auto</span> rptr = &amp;res[<span class="dv">0</span>];
+  transform(stri_begin(data, nr), stri_end(data, nr, nc), rptr, rptr,
+            [&amp;](<span class="at">const</span> <span class="dt">double</span>&amp; x, <span class="dt">double</span>&amp; y){
+              transform(&amp;x, &amp;x + nr, stri_begin(&amp;y, <span class="dv">0</span>), stri_begin(&amp;y, <span class="dv">0</span>),
+                        [](<span class="at">const</span> <span class="dt">double</span>&amp; a, <span class="at">const</span> <span class="dt">double</span>&amp; b){
+                          <span class="cf">return</span> a + b; });
+              <span class="cf">return</span> y; });
+  <span class="cf">return</span> res;
+}
+
+<span class="co">/*** R</span>
+<span class="co">local({</span>
+<span class="co">x = matrix(1:1e4, 1e2)</span>
+<span class="co">if (!identical(stri_col_sum2(x), colSums(x)))</span>
+<span class="co">  stop(&quot;stri_col_sum2 is incorrect&quot;)</span>
+<span class="co">})</span>
+<span class="co">*/</span></code></pre></div>
+<p>The 0-stride iterator uses <code>y</code> to accumulate the column sum and this is returned and assigned to <code>rptr</code>, which is iterated forward for each column.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">mb =<span class="st"> </span><span class="kw">microbenchmark</span>(<span class="kw">stri_col_sum</span>(x), <span class="kw">colSums</span>(x),
+                    <span class="kw">stri_row_sum</span>(x), <span class="kw">rowSums</span>(x),
+                    <span class="kw">indx_row_sum</span>(x), <span class="kw">indx_col_sum</span>(x),
+                    <span class="kw">stri_row_sum2</span>(x), <span class="kw">stri_col_sum2</span>(x))
+<span class="kw">print</span>(mb, <span class="dt">order =</span> <span class="st">&quot;median&quot;</span>, <span class="dt">signif =</span> <span class="dv">3</span>)</code></pre></div>
+<pre><code>## Unit: microseconds
+##              expr  min   lq      mean median   uq   max neval
+##  stri_row_sum2(x)  529  559  608.4244    574  614  1150   100
+##   stri_col_sum(x)  934  940 1053.4760    981 1040  2300   100
+##        colSums(x)  948  971 1135.2144   1000 1080  2490   100
+##  stri_col_sum2(x)  956  963 1140.6822   1020 1120  2540   100
+##        rowSums(x) 2020 2040 2332.5874   2090 2270  5620   100
+##   stri_row_sum(x) 1870 1960 2465.8133   2290 2850  3760   100
+##   indx_col_sum(x) 5450 5520 6286.6753   5670 6270 11800   100
+##   indx_row_sum(x) 5460 5510 6486.8116   5680 6910 11900   100</code></pre>
+<p>This version is no more efficient than the <code>accumulate</code> version. Perhaps there is something intrinsicly faster about row sums, or, more likely, the compiler handles <code>for_each</code> very efficiently. Figure 1. plots the observed runtimes for comparison.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(ggplot2)
+<span class="kw">autoplot</span>(mb) <span class="op">+</span><span class="st"> </span><span class="kw">theme_classic</span>()</code></pre></div>
+<p><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAkAAAAGACAYAAABFmt0fAAAEDWlDQ1BJQ0MgUHJvZmlsZQAAOI2NVV1oHFUUPrtzZyMkzlNsNIV0qD8NJQ2TVjShtLp/3d02bpZJNtoi6GT27s6Yyc44M7v9oU9FUHwx6psUxL+3gCAo9Q/bPrQvlQol2tQgKD60+INQ6Ium65k7M5lpurHeZe58853vnnvuuWfvBei5qliWkRQBFpquLRcy4nOHj4g9K5CEh6AXBqFXUR0rXalMAjZPC3e1W99Dwntf2dXd/p+tt0YdFSBxH2Kz5qgLiI8B8KdVy3YBevqRHz/qWh72Yui3MUDEL3q44WPXw3M+fo1pZuQs4tOIBVVTaoiXEI/MxfhGDPsxsNZfoE1q66ro5aJim3XdoLFw72H+n23BaIXzbcOnz5mfPoTvYVz7KzUl5+FRxEuqkp9G/Ajia219thzg25abkRE/BpDc3pqvphHvRFys2weqvp+krbWKIX7nhDbzLOItiM8358pTwdirqpPFnMF2xLc1WvLyOwTAibpbmvHHcvttU57y5+XqNZrLe3lE/Pq8eUj2fXKfOe3pfOjzhJYtB/yll5SDFcSDiH+hRkH25+L+sdxKEAMZahrlSX8ukqMOWy/jXW2m6M9LDBc31B9LFuv6gVKg/0Szi3KAr1kGq1GMjU/aLbnq6/lRxc4XfJ98hTargX++DbMJBSiYMIe9Ck1YAxFkKEAG3xbYaKmDDgYyFK0UGYpfoWYXG+fAPPI6tJnNwb7ClP7IyF+D+bjOtCpkhz6CFrIa/I6sFtNl8auFXGMTP34sNwI/JhkgEtmDz14ySfaRcTIBInmKPE32kxyyE2Tv+thKbEVePDfW/byMM1Kmm0XdObS7oGD/MypMXFPXrCwOtoYjyyn7BV29/MZfsVzpLDdRtuIZnbpXzvlf+ev8MvYr/Gqk4H/kV/G3csdazLuyTMPsbFhzd1UabQbjFvDRmcWJxR3zcfHkVw9GfpbJmeev9F08WW8uDkaslwX6avlWGU6NRKz0g/SHtCy9J30o/ca9zX3Kfc19zn3BXQKRO8ud477hLnAfc1/G9mrzGlrfexZ5GLdn6ZZrrEohI2wVHhZywjbhUWEy8icMCGNCUdiBlq3r+xafL549HQ5jH+an+1y+LlYBifuxAvRN/lVVVOlwlCkdVm9NOL5BE4wkQ2SMlDZU97hX86EilU/lUmkQUztTE6mx1EEPh7OmdqBtAvv8HdWpbrJS6tJj3n0CWdM6busNzRV3S9KTYhqvNiqWmuroiKgYhshMjmhTh9ptWhsF7970j/SbMrsPE1suR5z7DMC+P/Hs+y7ijrQAlhyAgccjbhjPygfeBTjzhNqy28EdkUh8C+DU9+z2v/oyeH791OncxHOs5y2AtTc7nb/f73TWPkD/qwBnjX8BoJ98VVBg/m8AAEAASURBVHgB7J0JvE3V+/8fIUShSCSzlEqRkAYUpZEiIiGlNNJAmg1l+CYlDYYmTZpImkxlKo2GJkPmKPPQIJny916//7od1zn3nnvvOfeee/bneb32Pefus/faa7333mt/1rOetXaevfvMZCIgAiIgAiIgAiIQIAIHBaisKqoIiIAIiIAIiIAIOAISQLoQREAEREAEREAEAkdAAihwp1wFFgEREAEREAERkADSNSACIiACIiACIhA4AhJAgTvlKrAIiIAIiIAIiIAEkK4BERABERABERCBwBGQAEryU759+3Zr1qyZTZ06NclLquKJgAiIgAiIQPQEJICiZ5Urt9y9e7eNHz/eVq1alSvzr0yLgAiIgAiIQDwISADFg6rSFAEREAEREAERSGgCEkAJfXqUOREQAREQAREQgXgQkACKB1WlKQIiIAIiIAIikNAEJIAS+vQocyIgAiIgAiIgAvEgIAEUD6pKUwREQAREQAREIKEJSAAl9OlR5kRABERABERABOJBQAIoHlSVpgiIgAiIgAiIQEITkABK6NOjzImACIiACIiACMSDgARQPKgqTREQAREQAREQgYQmkC+hc6fMiUCSEfj+++/t22+/daWqWbOmschEQAREQASyn4AEUPYz1xEDSGDLli3WvXt3mzlzpuXPn98R2LVrl1WrVs3uvvtuO+OMMwJIRUUWAREQgZwjoC6wnGOvIweIwMcff+zEz2OPPWbz5s1zy4gRI+zggw+2Tp06WY8ePez3338PEBEVVQREQARyloAEUM7y19EDQuDff/91Jb3ooossX758bmnQoIG9/fbb1qtXL5s8ebJdfPHFNm3atIAQUTFFQAREIGcJSADlLH8dPeAE8uTJY23atLH333/fKlasaDfccIPdfvvttn79+oCTUfFFQAREIL4EJIDiy1epi0BUBMqWLWujRo2yPn362GeffWbnn3++DR061P7666+o9tdGIiACIiACGSMgAZQxXtpaBOJGAG9Q69atbeLEiXbZZZfZsGHDrFGjRvb444/LIxQ36kpYBEQgqAQkgIJ65lXuhCVw+OGH24MPPuiEEDFDL774ohNCt956q4sRYvSYTAREQAREIGsEJICyxk97i0DcCNAtRoD09OnTrVu3bvbzzz+7GKH69eu7UWMffvihbd68OW7HV8IiIAIikMwEEk4A7dixIyxv5lHhQRBrmzBhgm3fvj3WyUadHq35L7/80r777jvbu3fvfvuRr0mTJu23LvQfhk1r1FAokeT8Xrx4cevcubPzCDFqrEWLFm4Y/R133GGnn366XXjhhXb//ffbmDFjbOnSpQdcR8lJRaUSAREQgawRSCgBNHv2bBs0aFDYEiGAZsyYEfa3rKx8+umn7Y8//shKEpned+3atXbllVfarFmz3Cigq666ykIF4OjRo61EiRIR0y9atKhNmTLFtm7dGnEb/ZBcBGrUqGE9e/Z0wphz//DDD9uJJ55oX331ld17771ODNWpU8cJpuHDh7tZp3fu3JlcEFQaERABEYgBgRybCXr37t22cuVK4yHOQ555UlasWGHbtm1zS4ECBZwYYDs8I+XKlXPdANGU+e+//3ai5qijjtpvc7wtv/32mx199NFuHpb9fkznnz///NPWrVtnZcqUsUMOOcRtjQfm0EMPtYMO+j8diUijtU6e//nnHytUqJCtXr065XikwcPoiCOOcPvTmifGg4nwMOI+/HwwmzZtcl4hfmMkEMfwx6V8GP83b97cxYgwdFoWLALHHHOMsVxxxRWu4HSH4UmcM2eOzZ071xD3CGomWzz55JOtVq1a7tUbJ5xwgh155JHBgqXSioAIiEAqAjkigJjjhJgGxATfmf+ka9euNn78eDcb7ptvvmm1a9e2IUOGOO8GE8c98MADxiy6BISmZcyuy5wqlStXdsLhiSeesCJFiriHAa8hKFasmG3YsMEeffRRq1SpUlpJpfyGKBk5cqRLc+HChXbTTTdZkyZNrF27dvbcc89ZqVKlbM+ePXbppZfa1KlTjW3IK688YGQPZWzZsqXrwkCEnXPOOa6Fzpwv/O4NQeW748aOHWv16tVzP3399df2zDPP2Msvv2yIn2uvvdb69+9v1atXdw80vADXXXedE2M+LT/xnv/06/WZMwT8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RvQxuo8RfMzn9Ouvv7r/edlv6EzguaJQyqQIiIAI5GICEkC5+OQp67mHADMyM2XBiBEjbObMmW4Wb9bh/WE+H5kIiIAIiED2EpAAyl7eOlqACVSqVElzNgX4/KvoIiACiUUg515RnVgclBsREAEREAEREIEAEZAACtDJVlFFQAREQAREQAT+j4AEkK4EERABERABERCBwBGQAArcKVeBRUAEREAEREAEJIB0DYiACIiACIiACASOgARQ4E65CiwCIiACIiACIiABpGtABERABERABEQgcAQkgAJ3ylVgERABERABERABCSBdAyIgAiIgAiIgAoEjIAEUuFMe/wJv3brV/vrrr/gfSEcQAREQAREQgUwSkADKJDjtdiCBVatWWceOHa1u3bp22mmn2Z133ml//PHHgRtqjQiIgAiIgAjkMAG9CyyHT0CyHH7p0qXWrl07O/jgg61v3772559/2tNPP22LFi2yV155xYoXL54sRVU5REAEREAEkoCABFASnMScLgJenuuvv94OO+wwe/XVV61kyZIuS2eccYa1b9/ebrzxRnv55ZedOMrpvOr4IiACIiACIgABdYHpOsgygYceesi2bNliw4YNSxE/JHrcccc5L9APP/xgvXr1yvJxlIAIiIAIiIAIxIqABFCsSAY0ncmTJ9tHH31k99xzj1WsWPEACsQCPfDAAzZmzBh74YUXDvhdK0RABERABEQgJwioCywnqCfJMbdv324PP/yw1atXz6644oqIpbryyittyZIlNnDgQCtWrJhdfvnlEbfVDyIgAiIgAiKQHQQkgLKDcpIeY8SIEbZx48aoPDv33nuvGxGGp2j16tV20003Wb58uvyS9NJQsURABEQg4QmoCyzhT1FiZnDNmjX2/PPP21VXXWWVK1dON5MHHXSQ8wARLM3osGbNmtmHH35ou3fvTndfbSACIiACIiACsSYgARRrogFJ77HHHrOCBQvazTffHHWJ8+TJ4+YGeuONN6xo0aJ2xx13WMOGDW3o0KG2efPmqNPRhiIgAiIgAiKQVQISQFklGMD9582bZ++//77deuutTshkFEHNmjXt9ddft7ffftvOPPNMoyutUaNGhqjSDNIZpantRUAEREAEMkNAAigz1AK+z8iRI61ChQrWpk2bLJGoUaOGDRgwwKZNm+bSevHFF61p06auayxLCWtnERABERABEUiHgARQOoD084EEtm3b5uJ+YhXEfMQRR1jPnj3dcPrjjz/edY0xgeKPP/544MG1RgREQAREQARiQCDHBdCOHTvCFoOJ9aZPnx72t2RauWvXLvvyyy/tu+++s7179+5XNIaZT5o0ab91of/8/vvvznsSui43fy9XrpzhXXrqqafs119/tRYtWti1115rn3zyiYKlc/OJVd5FQAREIAEJ5KgAmj17tg0aNCgsFgTQjBkzwv6WLCvXrl1rzJEza9YsF1PDiKpQQTh69GgrUaJExOISSDxlyhTj7evJZE2aNLEJEya4OYbWrVvnhsyfddZZ9sgjj8grlEwnWmURAREQgRwkkG0TsTDceeXKlS5olof6v//+aytWrDC6U1gKFCjgHv5shycEb0C3bt3SRMO2CAa/D5PsYXhVfvvtNzv66KPdXDP8/88//9ihhx7qfv/7778tb9687pisQED4fd0GYf7wck8exmXKlLFDDjnEbYEHhjQZ4o0h2njpJ/nheIUKFXJz3vh8kMbOnTuNLh+MIOCLLrrIOnXq5P5/8MEHjZmVL774Ytu0aZPzCvEbgcEcwx+X/GP837x5cyN25vbbb3frsuPPnj174n6Y/Pnzu8kVmWAR79i7775r48aNc+8UI/6ocePGVqdOHaPL7Mgjj0w3P5wPvEqMNvPnn3PHtViqVKlcMycR1xbzKDENgQ8YL1KkiGPATNz+WkwXiDYQAREQgYATyBYBtH79eidmEA98p6Lu2rWrjR8/3hARb775ptWuXduGDBnixAixJbw+gVFBPNwj2fz58/fbh+HVzzzzjM2cOdMJmg0bNtijjz7qhMJ1113njscDArFQtWpVu+uuu9yDBKFFHiIZooSuGea7WbhwofNI4KXg7efPPfece4AiCi699FKbOnWq24a88xBn6DdlbtmypU2cONGJs3POOcc6d+5sN9xwg/vdHxcWdHthY8eOdTMs8/3rr7925eKFojy86Rbq37+/Va9e3RhRxWzMlM8LPPZhjh2M9BiuHksLFZOxTDdSWieffLKxMJkifHn1Buca9hhvoOcFrIhPXsiKMETgkk9EKWKBayGScU1wbZYtW9ZKly7t0iIdBCznj3MLRwQHYpmXvyLaESPsC1+2ZeG4bM+xOVd8Iva5pgsXLuzOEWLb55N9+Y10OBbG9j4NRDNieNWqVa4BQSOC44YzrosePXqE+0nrREAEREAEUhHIFgFEjEuVKlWsT58+TgAMHz7cPTQYRcRveDm+//57W7Zsmb311lvOQ7JgwYJUWQ3/b+g+CB8ekLyRnAcLaeFlufvuu11L/+eff3ZeIbwAc+bMcQnS/UT3SlqGmOCN5gzVXrRokf30009pbe5+w7vFQxrvwm233Wbffvut814ghhArCCAe3N4+/fRT17K/4IIL3Cry2qpVK/cdwUQ+4fbLL79Y69atnfjhRx64eMuWL19ujKryxhw73hAGsbTUsUqxTDuttOB1/vnnO+/P3Llz7Z133nEeM4QJ3h2WtAzRi2jEA4dXkO0JtOac4FVhyQ1Wvnx512A45phjnLeUcnCNIpRkIiACIiAC0RHIFgHECzFHjRplHTp0sDPOOMN1+/junNBs0gqnJZ8RC90HYVK/fv0UjwfCgdFEd955p5tvBk8KDw8ED8ILrwDCgm3SMkRJv379XJwO89bg/UnP8CQgfjDyWGFftw1GlwteCVrxfhQVnjBE2+DBg43uDAxBE9q1g9cKjxNeitTDz9kutQCifBjigDLH0hBdOWGIHrrC8KThiSEfeBNh4j1AxEWl9gDRHeoFDt4jxA+GR4bzcfrppxtignQ4V6wjHUQ0nhnvAcIbg5cODxBcOYfkge5bjum9OaynaxYvEZ/sz7nm3OKlI22fT79Pag+QTyPUA4SoXrp0qfFJdyDpYuxL+ekSlImACIiACERHIFsEEGKALiYm0GNkF10/dFWlNroQMmqh+/AQ4AHhjXgbFh4QiB5mHKa1zwOPh+Bnn33mhMNJJ53kdwn7ideBfT7//HP38PWxKGzsH0I+LscnEJov1nlvj+/m8Nu98sorLk3y5gWT394/qPmfbhw8L3SF0NLnIe2NMtLdFmre68ODN9YeGx7a2WUEitMdCHO6fygXcVPEANWqVStF7GYkP4gLrgmW3GqcU3/NIb5SX1e5tVzKtwiIgAhkF4FsEUAff/yx/fDDDy4+gVgf4mh4oCMKQkc9ZbXQDRs2dDMM+2BkRhIRJMuD7thjj3VBzHh9eBEnD8HHH3/c6tatm+6DkNiTSy65xPAEnXLKKc5jxP7EceB5wWvgPS4ZKQPeCIZ4P/vss/vF75BGtWrV3AOfrkMY9e7d28VN4ckg/ofRc/6hR7cY3rXsMn/ceB5v8eLFTiRzDhFx5557rvEiVYSs95xl9vhZ3T+zx43lfpwDPFgyERABERCBzBHIFgFEVxTDtTt27Og8MjzUcdczqooHOZPgtW3bNnMlCNkLrwjeAYaWE+dBlwNDpzEeGIgdPES0mPEeEAt09tlnh6QQ/ivpIZYIyEZA8QoIHqJXX321C0DGc4PAolsjI/bCCy84BuTZG3PfECBOeogrjNgfunqIQUJ44UUbM2aMC6zmf7xase7m8vnJ7k+6mGCNx5Dz2b17dzcfUEbZZne+dTwREAEREIHcRSDPPlf63uzKMiNiOFxo9xAjXujqIY4iVkZ6HCt0VFQs0ib2A1EV2nXCsfDQ+NidWByHNDZu3OhGqyG60vJY4CEhYDzSMHhiSPBUEYOVXqxTtHlHyCIiw3VjRptG6u24LojvYdQeXTsEnV9zzTUxvS5SH1P/i4AIiIAIBJdAtniAPN5wsSOIibTED0PdGXkVzvDo0P2U2oiHSR0Tk3qb0P8RNnRFhTMCYwnixhASqS2jx0q9f6T/8X4QbI3njPdjhTNEAwHUvE8rO42AYYSX72rMyrGJoaKMiCm6Rontue+++8Ke16wcR/uKgAiIgAiIQCiBbBVAoQeO9jveokiTFGZE5KR1PERYpGPg6cgpY7j7F198EfHwjITCGxNOmEXcKQY/3HLLLW5EHIHbTN6YGUM80c3FVAHEgxFb9dJLL7lg88ykp31EQAREQAREICMEsrULLCMZ07axIRCPLjBy9vTTT7vl/fffdxNERptbugyZVHLEiBEunokRdsR/nXrqqdEmoe1EQAREQAREIMsEcu844CwXXQlkhQCzDtNNl5HuN4LOCRx/8skn7fLLLzcmf2TGbImfrJwJ7SsCIiACIpAZAhJAmaGmfdz8O4zQ4oW1zL6dntHlhfhhZBuv9KDrLHSix/T21+8iIAIiIAIiEEsCEkCxpBmwtJgbCe8N7yLz7zALh4CJGhnVxRQCiB/NWByOktaJgAiIgAhkJwEJoOyknYTH4v1ufj6nSMXD28NEmMQNMcGjTAREQAREQARymoAEUE6fgVx+fCa15GWvvMts8uTJB5SGyR6Z3wcR5KcTOGAjrRABERABERCBbCYgAZTNwJPxcLzdvkGDBnbXXXftN2z/rbfesoEDB7rYH4b0y0RABERABEQgUQgk/DxAiQJK+YhMgHmUeH0FL7nt1KmTnXfeecbwe14ey2gv3qUmEwEREAEREIFEIiABlEhnIxfnhRdz8toOFmaJ5kW3vLQVASQTAREQAREQgUQjIAGUaGckF+eHmbmvv/56t+TiYijrIiACIiACASCgGKAAnGQVUQREQAREQAREYH8CEkD789B/IiACIiACIiACASAgARSAk6wiioAIiIAIiIAI7E9AAmh/HvpPBERABERABEQgAAQkgAJwklVEERABERABERCB/QloFNj+PPSfCIiACIhAQAgsXLjQJk2aZKVKlbLmzZtbgQIFAlJyFRMCEkC6DkRABERABAJHYNy4cW6S1kKFCtm2bdvc63yYx6xEiRKBYxHUAqsLLKhnXuUWAREQgYAS4OXM9913nzVt2tS9vmfMmDG2ceNG69Kli+3cuTOgVIJXbAmg4J1zlVgEREAEAk2gb9++VrFiRRswYICbtf6EE06wp59+2ubPn29Dhw4NNJsgFV4CKEhnW2UVAREQARGw1atX27nnnuvEj8dRq1YtN4v9888/b8QGyZKfgARQ8p9jlVAEREAERCAKAjfddJOVLVvWevXqZXv37o1iD22SmwlIAOXms6e8i4AIiIAIxIwAL3G+//77be7cuUaQtCy5CUgAJff5VelEQAREQAQyQODss8923WOPPvqo/fHHHxnYU5vmNgISQLntjCm/IiACIiACcSVw7733uqHxgwYNiutxlHjOEpAAyln+OroIiIAIiECCESAOqGvXrvbmm2/a559/nmC5U3ZiRUACKFYklY4IiIAIiEDSEOjYsaOdeuqp1r17d1u3bl3SlEsF+Y+ABNB/LPRNBERABERABByBgw46yB5//HHLkyePde7c2bZu3SoySUZAAijJTqiKIwIiIAIiEBsCvCNs5MiRtmbNGmvTpo0tXrw4NgkrlYQgIAGUEKdBmRABERABEUhEAtWrV7fXX3/ddu/ebZdddpn17t3bfv7550TMqvKUQQI5JoAmT57souwzkt9vvvnGfv3114zskulteS/MzJkzM71/LHbcvn27e1NxpLR+//13mzZtWqSftV4EREAERCAMgYxOcli1alUbP3686wp7//337ZJLLrHGjRu7l6kSKM27xf75558wR9KqRCaQY2+DnzJlip188slWuHDhqPm8++67ds4559jRRx8d9T6Z3XDVqlXu7cBnnXVWZpPI8n6jR4+2U045JWI6RYsWNTiyTbFixSJupx9EQAREQAT+I5BRAcSevDWekWE33HCDTZ061T777DObPXu28SJVjFihY445xr1jrHz58m5G6dKlS9uRRx5pJUuWdG+ZL1CggNs2s3/oiuN9ZUuWLDGeUQRn0xDesWOHm7ma9A899FB3rDJlyhj5qFy5slWpUsUOOeSQzB42affLMQHEPAtFihRxbkWUMxcXJ5QLJbUo8uv9Wfjrr7+MADV/Qv/++2/3k//fbxfukwuG9Dl2qHGMww8//IBjh24T7jtu0ZUrVxpipESJEm4T1uG94ULEeLvwrl27XNpcrGy7du1al//DDjvMMeB/hl5627Rpk3333XfWqVMnS6u8zZs3txdffNFuv/12v6s+RUAEREAE0iBAHZ1ZK1iwoF1wwQVuIY0///zTvTts0aJFTpgsW7bM6OGgTk8ttHjuIIiOOuoo15CnzmdBKPH84JnBs41nIr0Qv/zyiy1dutR++ukn+/77743nAobQKVeunBGjhOgiTxhCiGcMsUqItNCJHDkOnqxKlSo5YYRA4nlbvHhx9ywiTY6NkMP45P9oDJ485/yzjucdC/nxC2XiO9vu2bPHJZsvXz73PjaOzXOZspCf7LIcE0DXXHONPfnkky6yfvDgwfbvv/+6k8/J7tOnj9WuXds2b95st9xyi1vPiWeacuzrr7+2Z555xl5++WVD/Fx77bXWv39/o682km3bts3uuOMOdwI4qXifUPOo+OHDhzsPCv26Xbp0cf28kdIJXb9+/Xrr1q2bcSHxnbcL0z+MO3TYsGEuXbafPn26uxj79etnDK2sUaOGu5A5XocOHWzixInu5FOWF154wfLmzWtjx461evXqucOlVd6aNWvaww8/bNddd12K4GKnm2++2e3LxZadF5Q7qP6IgAiIQAIT4HkTK0O0nHbaaW4JTZO6FxHDs2HDhg2uzucTYcQyZ84cozstva4zhMHxxx9vl156qZ100kl24oknOqEQjTjZsmWLIcgQRLzgFc8Rr/jwQio0v5G+8zzKnz+/WxAsCCOEHQy96PGCJlIa0a6vVq2a62qMdvusbpdjAig045wcxAwC4rXXXnMAEECInDPPPNN4QR2q9vLLL3e70Q02a9YsJzBQyK1bt05T/LATkfwVKlSwe+65xynQu+++270RGPGAeEJI4B1CSNC/G419+eWXzrWIYEPtIqS8Nyqt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iigCIiACIvAfgTvuuMNmzpxpJ554otWsWdO9BX7Tpk02Z84cGzt2rB166KF25ZVXWqdOnezwww//b0d9SyoCEkBJdTpVGBEQAREQgfQI/PXXX9a0aVN74oknDth0yZIlNnr0aHvllVfstddecyLo2muvtUMOOeSAbbUidxNQDFDuPn/KvQiIgAiIQAYJ5MmTx1jCWZUqVeyBBx6wTz/91C6//HIbNmyYnX/++fbuu+/a3r17w+2idbmUgARQLj1xyrYIiIAIiEDmCEQjZI444ggnhD744APXVdazZ0+77LLL7LPPPsvcQbVXwhGQAEq4U6IMiYAIiIAIxJNAJO9PuGNWrFjRnn32WXvppZec14jusLZt29r06dPlEQoHLBetyzYB9NNPP9nixYszhOabb76xX3/9NUP7JNPGjEyYNGlSxCL9/vvvNm3atIi/6wcREAEREIEDCUTjAUq91+mnn+4CpIcMGWLEEF1//fUujmjkyJH222+/pd5c/+cCAtkmgObPn59hAUSf64IFC3IBxvhkkUC8EiVKREy8aNGiNmXKFNu6dWvEbfSDCIiACIhAbAjgOSJ4evz48fbCCy8Y8UIEUjdq1MiaNWtmAwcOdI3WVatWyTsUG+RxTSXbRoFdfPHFKUFneC54eK9bt84VrlSpUvsVkounZMmSKet27Nhh//zzj9uHlbt27bK///475f+UDUO+8Hu+fPls48aNduSRR7rv/LxlyxbbuXOn+WMiHg477DA76KCDXLochyGQmE/j4IMPdv+H+7N7925buXKly4sXK6zDe+PT4XjkuXDhwubLvnbtWjeqgGOzPf+XLVs25RAMyfzuu+/cCARaG+TPj0IgXxj/N2/e3F588UW7/fbbU/bVFxEQAREQgcgEqI+zameccYax8AzBU8+wehrtCCOsQIECdvTRR7tnDfFEPPOKFClihQoVcr/xfKJex/BI8RxgIW888/zCM8l/51nCNv/++69b2Jc0WEiPZxVLwYIF3XE4Fs8JjsvC84bnEnnhu88T6QTRsk0APf/88w54+/btrWPHjnbSSSc5AYQIQj137drVNm/ebLfccos7QQgALzx44Hfo0MEeeughO/XUU11gGv2yN9xwQ8RzNmLECCdMfv75ZzvvvPPsqquusn79+jkBwgVbqVIlGzBggPXo0cOlQ7pjxoxxwx5R9yj92267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QAREQAREQAREIHAEJIACd8pVYBEQAREQAREQAQkgXQMiIAIiIAIiIAKBIyABFLhTrgKLgAiIgAiIgAhIAOkaEAEREAEREAERCBwBCaDAnXIVWAREQAREQAREQAJI14AIiIAIiIAIiEDgCEgABe6Uq8AiIAIiIAIiIAISQLoGREAEREAEREAEAkdAAihwp1wFFgEREAEREAERkADSNSACIiACIiACIhA4AhJAgTvlKnBOE/jll19szZo1OZ0NHV8EREAEAk1AAijQp1+Fz04Cu3btsjvuuMOaNGliDRs2tO7du9uOHTuyMws6lgiIgAiIwP8nkE8kREAEsofAwIEDbcKECdarVy/bs2eP8f/mzZtt+PDhli+fbsXsOQs6igiIgAj8HwF5gHQliEA2EFiwYIG9+uqrdtttt1mbNm2sXbt2NnToUJs1a5YNGDAgG3KgQ4iACIiACIQSkAAKpaHvIhAnAkOGDLGjjz7aOnXqlHIEusHuuusue+WVV+zDDz9MWa8vIiACIiAC8ScgARR/xjpCwAksXbrUpk6dap07d7aDDz54PxrXXnutNW7c2O6//35jO5kIiIAIiED2EJAAyh7OOkqACUyZMsUJn+bNm4elQBdYyZIl7aabbrI//vgj7DZaKQIiIAIiEFsCEkCx5anUROAAArt377YCBQpYwYIFD/iNFYceeqg9++yztmHDBrvlllts586dYbfTShEQAREQgdgRkACKHUulJAKZJlC5cmV76qmnbM6cOdatWzdjyLxMBERABEQgfgQkgOLHVimLQIYI1K9f3wYPHmzTpk1z3WF///13hvbXxiIgAiIgAtETkACKnpW2FIG4EzjvvPPs6aeftq+//tquvPJKY9ZomQiIgAiIQOwJSADFnqlSFIEsEWjUqJG99tprLiCawGm+//vvv1lKUzuLgAiIgAjsT0ACaH8e+k8EEoLAiSeeaO+9954bIt+nTx9DCH366acJkTdlQgREQASSgYAEUDKcRZUhKQkULVrU/ve//7kZpBlFduONN9pll11mDKuXiYAIiIAIZI2ABFAYft9///1+k9KtXLnSxowZ4x5EX331VZg94rNq+/btNmnSpIiJ//777y5gNuIG+iEpCJx22mn29ttv24gRI9w7w26++WYnhJhcUSYCIiACIpA5AhJAYbjRwv7mm2/cL59//rl17drVFi9e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iEAwCWgeoGCed5U6hwi0bdvWli9fbgMHDrRixYrZ5ZdfnkM50WFFQAREINgEJICCff5V+hwgcM8999jvv/9ufP7xxx/WsWPHHMiFDikCIiACwSYgARTs86/S5wAB3gs2YMAAK1KkiPXv39/mz5/v4oIKFSqUA7nRIUVABEQgmAQUAxTM865S5zABRNCDDz5offv2tY8//th1hSGEZCIgAiIgAtlDQAIoezjrKCIQlkCrVq1cUHSePHnsiiuusGeffdZ2794ddlutFAEREAERiB0BCaDYsVRKIpApAscdd5y9++671q5dO3viiSecEFq4cGGm0tJOIiACIiAC0RGQAIqOk7YSgbgSKFCggAuKfu211+zvv/+2Fi1a2NNPP216hUZcsStxERCBABOQAArwyVfRE49A7dq1bfz48Xb11Vfbk08+6T7XrVuXeBlVjkRABEQglxOQAMrlJ1DZTz4CeIN69uxpL774opsziLmC5s6dm3wFVYlEQAREIAcJSADlIHwdWgTSIlC/fn0bN26clS5d2nmC3nrrrbQ2128iIAIiIAIZIJCrBFCkN2lPnjzZtm3bloFip7/pxo0bbebMmelvGMcteI/UpEmTIh6ByfSmTZsW8Xf9kPsJlCpVyogLuuiii+yBBx6wO+64wzZv3pz7C6YSiIAIiEAOE8g1AmjIkCH25ZdfhsU1ZcqUmAugVatW2auvvhr2eNm1cvTo0SnvkQp3zKJFixpl37p1a7iftS6HCezduzcmOaBLjFdnPPLII07wnnfeecb98Msvv8QkfSUiAiIgAkEkkJAzQf/2229uLpQyZcpYvnz5DM/PihUrrGrVqrZz5073G+vx0hx55JF27733ull1ozmBBJTygkpm4Q01BM/hhx/ufgtdn9535mxZuXKlIUb8Sy9Zh/fm0EMPdbuT5127drm08dqw7dq1a+2QQw6xww47zJWH/8uWLZtyuE2bNtl3331nnTp1sr/++suYOI/tMUYJYfzfvHlzFyty++23u3X6kzgE/v3335hmpmXLlnbWWWe5t8o/99xz9swzz9jRRx9txx9/vFWqVMmOOeYY111GlxmeI3/9RZMJxBqv5fjnn3+MOYm4tlLfI9Gkk2zbcO9SH61evdp9wgg+jRo1csyTrbwqjwgEiUDCCSBmx6XCQRggCgYPHmwLFiywJUuWuPcnHXXUUTZj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ywgQxzVixAg35xWjCBndd9xxx+WyUii7IiACIpD7CEgA5b5zphwnCQEC95k/ikk/eSfcXXfd5WY7TpLiqRgiIAIikNAEJIAS+vQoc8lKgJnImeGc9889/fTT1rhx42QtqsolAiIgAglJQAIoIU+LMpXMBHi/1NVXX+0m+nzjjTdcwHMyl1dlEwEREIFEJCABlIhnRXlKWgK8F45XWvDiTSZJzKkRhkkLWAUTAREQgSgJSABFCUqbiUBWCRDw3L17d1u6dKm9+uqrEj9ZBar9RUAERCALBBLqZahZKId2FYGEI1C6dGnjFSu8DBfxw3vteB8dM3fXqFEj4fKrDImACIhAkAjIAxSks62yZiuByy67zMaOHWtdunQxXseyePFiu+++++zCCy/M1nzoYCIgAiIgAgcSkAA6kInWiEBMCPAS25EjR7pRXr/99pv17NnTzjzzzJikrUREQAREQASyRkACKGv8tLcIpEmAV7TwPi+ZCIiACIhAYhFQDFBinQ/lRgREQAREQAREIBsISABlA2QdQgREQAREQAREILEISAAl1vlQbkRABERABERABLKBgARQNkDWIURABERABERABBKLQJ5985PsTawsKTexJMDMw3Xq1LGFCxfaQQdJ78aSbSzSYqRY3rx5bceOHbFITmmIgAiIQFwJ5KY665JLLrF33nknIg+NAouIJjl+KFSokI0ZM8Y++OCD5ChQkpWCSRKXLFli7dq1S7KSqTgiIALJSGDmzJnGtB6tW7dO+OJVrlw5zTzKA5QmHv0oAvEl8OijjzpxOn369PgeSKmLgAiIQAwI9O7d281u//HHH8cgtZxNQn0iOctfRxcBERABERABEcgBAuoCywHoOqQIeALnn3++Va9e3f+rTxEQARFIaAKXXnqp1atXL6HzGG3m1AUWLSltJwIiIAIiIAIikDQE1AWWNKdSBREBERABERABEYiWgARQtKS0nQhkkABTD6xYsWK/vTZu3GgTJ060RYsW7beef1g3adIkY5tQY4j8559/brNmzbJdu3aF/qTvIiACIpAlApMnT7bdu3fvl0akeiqtuigz++x30Bz4J2+vfZYDx9UhRSCpCSxfvty6detmlSpVsqpVq7qyzp07160rVqyYDR8+3AoWLGjHH3+8++3xxx+3cePG2c6dO93b48844wwrWrSoMY/TNddcY9u2bXMi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" /><!-- --></p>
+</div>
+</div>
+<div id="range-based-for-loops" class="section level2">
+<h2>Range-based for loops</h2>
+<p>In addition to <code>stri_begin</code> and <code>stri_end</code>, <strong>strider</strong> provides a strided range for range-based for-loops.</p>
+<div class="sourceCode"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span class="co">// [[Rcpp::depends(BH)]]</span>
+<span class="co">// [[Rcpp::depends(strider)]]</span>
+<span class="co">// [[Rcpp::plugins(cpp11)]]</span>
+
+<span class="pp">#include </span><span class="im">&lt;Rcpp.h&gt;</span>
+<span class="kw">using</span> Rcpp::wrap;
+<span class="kw">using</span> Rcpp::IntegerVector;
+<span class="pp">#include </span><span class="im">&lt;vector&gt;</span>
+<span class="kw">using</span> <span class="bu">std::</span>vector;
+<span class="pp">#include </span><span class="im">&lt;strider.h&gt;</span>
+<span class="kw">using</span> strider::make_stri_range;
+
+<span class="co">// [[Rcpp::export]]</span>
+SEXP stri_nth_values(<span class="at">const</span> IntegerVector&amp; x, <span class="dt">int</span> stride, <span class="dt">int</span> strides)
+{
+  vector&lt;<span class="dt">int</span>&gt; res;
+  <span class="cf">for</span> (<span class="kw">auto</span>&amp;&amp; v : make_stri_range(&amp;x[<span class="dv">0</span>], stride, strides)) res.push_back(v);
+  <span class="cf">return</span> wrap(res);
+}</code></pre></div>
+<p>The <code>make_stri_range</code> simply encapsulates calls to <code>stri_begin</code> and <code>stri_end</code>. It is currently a very minimal implementation. There is no boundary checking, so improper use will cause heap corruption. Other than <code>begin</code> and <code>end</code> methods, a range concept is not yet a part of the standard library. See however <a href="http://www.boost.org/doc/libs/release/libs/range/">Boost Range v2</a> and the <a href="https://github.com/ericniebler/range-v3">range-v3 proposal</a>. Both implement strided iterators over ranges, but would not be considered light-weight.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">stri_nth_values</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">1000</span>, <span class="dv">21</span>, <span class="dv">11</span>)</code></pre></div>
+<pre><code>##  [1]   1  22  43  64  85 106 127 148 169 190 211</code></pre>
+<p>A strided range can be used to loop over all elements of an arbitrarily dimensioned array with extents only known at runtime.</p>
+<div class="sourceCode"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span class="co">// [[Rcpp::depends(BH)]]</span>
+<span class="co">// [[Rcpp::depends(strider)]]</span>
+<span class="co">// [[Rcpp::plugins(cpp11)]]</span>
+
+<span class="pp">#include </span><span class="im">&lt;Rcpp.h&gt;</span>
+<span class="kw">using</span> Rcpp::stop;
+<span class="kw">using</span> Rcpp::IntegerVector;
+<span class="kw">using</span> Rcpp::Dimension;
+<span class="kw">using</span> Rcpp::Rcout;
+<span class="pp">#include </span><span class="im">&lt;strider.h&gt;</span>
+<span class="kw">using</span> strider::make_stri_range;
+
+<span class="co">// [[Rcpp::export]]</span>
+<span class="dt">void</span> stri_loop_range_3(<span class="at">const</span> IntegerVector&amp; a)
+{
+  IntegerVector d = a.attr(<span class="st">&quot;dim&quot;</span>);
+  <span class="cf">if</span> (d.size() != <span class="dv">3</span>) stop(<span class="st">&quot;Expecting 3D array&quot;</span>);
+  <span class="cf">for</span> (<span class="kw">auto</span>&amp;&amp; x : make_stri_range(&amp;a[<span class="dv">0</span>], d[<span class="dv">1</span>] * d[<span class="dv">2</span>], d[<span class="dv">0</span>]))
+    <span class="cf">for</span> (<span class="kw">auto</span>&amp;&amp; y : make_stri_range(&amp;x, d[<span class="dv">2</span>], d[<span class="dv">1</span>]))
+      <span class="cf">for</span> (<span class="kw">auto</span>&amp;&amp; z : make_stri_range(&amp;y, <span class="dv">1</span>, d[<span class="dv">2</span>]))
+        Rcout &lt;&lt; x &lt;&lt; <span class="st">&quot; &quot;</span> &lt;&lt; y &lt;&lt; <span class="st">&quot; &quot;</span> &lt;&lt; z &lt;&lt; <span class="bu">std::</span>endl;
+}</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">x =<span class="st"> </span><span class="dv">1</span><span class="op">:</span>(<span class="dv">2</span> <span class="op">*</span><span class="st"> </span><span class="dv">2</span> <span class="op">*</span><span class="st"> </span><span class="dv">2</span>)
+<span class="kw">dim</span>(x) =<span class="st"> </span><span class="kw">c</span>(<span class="dv">2</span>, <span class="dv">2</span>, <span class="dv">2</span>)
+<span class="kw">stri_loop_range_3</span>(x)</code></pre></div>
+<pre><code>## 1 1 1
+## 1 1 2
+## 1 3 3
+## 1 3 4
+## 5 5 5
+## 5 5 6
+## 5 7 7
+## 5 7 8</code></pre>
+</div>
+<div id="conclusions" class="section level2">
+<h2>Conclusions</h2>
+<p>Experimenting with the C++ standard library algorithms demonstrates that they are often highly efficient and, in some cases, faster than corresponding native R algorithms. However using the standard library algorithms with multidimensional data is challenging and it is quite common for authors to resort to index-based for-loops, which can impede performance.</p>
+<p>The <strong>strider</strong> package provides a lightweight pointer-adapter that makes using the standard library algorithms straightforward with multidimensional buffers accessible via a pointer. As long as one knows the dimensions and the memory layout of the data, then any dimension can be scanned by computing a stride and number of strides. When it is possible to scan the data sequentially, maximum performance is attained. Owning to the large number of legacy libraries whose APIs pass raw pointers to structured buffers, I expect that <strong>strider</strong> may find a wide range of applications while also improving code reliability and comprehension.</p>
+<hr />
+</div>
+
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
