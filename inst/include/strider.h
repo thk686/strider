@@ -113,6 +113,27 @@ make_stri_range(T* ptr, ptrdiff_t stride, ptrdiff_t strides)
 //            [](x)) nd_transform(begin_extents + 1, end_extents, margins, &x, closure)
 //
 
+using std::next;
+using std::multiplies;
+
+template<typename T, typename U>
+nd_transform(T* data, U* extents_begin, U* extents_end)
+{
+  if (next(extents_begin) == extents_end)
+  {
+    
+  }
+  else
+  {
+    auto stride = accumulate(next(extents_begin), extents_end, 1, multiplies<U>);
+    for_each(stri_begin(data, stride),
+             stri_end(data, stride, *extents_begin),
+             [&](const T& x){
+               return nd_transform(&x, next(extents_begin), extents_end); });
+  }
+  
+}
+
 }; // namespace detail
 
 using detail::stri_end;

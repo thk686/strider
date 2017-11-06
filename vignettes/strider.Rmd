@@ -21,7 +21,7 @@ The **strided_pointer** template is as minimalist as possible. It inherits from 
 
 ## Usage
 
-The **strided_pointer** and related functions are designed to be used in C++ code. I first create a header to avoid some repetitive code declarations. Unfortunately, Rcpp attributes cannot be used in a header and are included in the code examples below. The dependency on BH is only to fix a problem with Travis CI. For sake of brevity, the header contents are omitted here. They can be found in the original markdown file.
+The **strided_pointer** and related functions are designed to be used in C++ code. I first create a header to avoid some repetitive code declarations. Unfortunately, Rcpp attributes cannot be used in a header and are included in the code examples below. The dependency on BH is only to fix a problem with Travis CI. For sake of brevity, the header contents are omitted here. They can be found in the original markdown file. All compiler flags are left at default values as determined by R.
 
 ```{r echo=FALSE}
 header_code = '
@@ -52,7 +52,6 @@ header_file = "vignette.h"
 cat(header_code, file = file.path(tempdir(), header_file))
 pkg_cppflags = Sys.getenv("PKG_CPPFLAGS")
 pkg_cppflags = paste(pkg_cppflags, paste0("-I\"", tempdir(), "\""))
-pkg_cppflags = paste(pkg_cppflags, "-DSTRIDER_USE_THROW")
 Sys.setenv(PKG_CPPFLAGS = pkg_cppflags)
 ```
 
