@@ -21,7 +21,7 @@ The **strided_pointer** template is as minimalist as possible. It inherits from 
 
 ## Usage
 
-The **strided_pointer** and related functions are designed to be used in C++ code. I first create a header to avoid some repetitive code declarations. Unfortunately, Rcpp attributes cannot be used in a header. The dependency on BH below is only to fix a problem with Travis CI.
+The **strided_pointer** and related functions are designed to be used in C++ code. I first create a header to avoid some repetitive code declarations. Unfortunately, Rcpp attributes cannot be used in a header and are included in the code examples below. The dependency on BH is only to fix a problem with Travis CI.
 
 ```{r}
 header_code = '
@@ -90,11 +90,17 @@ if (!identical(indx_col_sum(x), colSums(x)))
 
 This code is suboptimal for a number of reasons. For one, each vector and matrix access requires computing pointer offsets into the underlying buffer. The results below show that this implementation is much slower than R's built-in ```colSums``` function.
 
-```{r}
+```{r message=FALSE, warning=FALSE}
+library(tidyverse)
 library(microbenchmark)
+```
+
+```{r}
 x = matrix(rnorm(1e6), 1e3)
-mb = microbenchmark(colSums(x), indx_col_sum(x))
-print(mb, "ms", "median", 2)
+microbenchmark(colSums(x), indx_col_sum(x)) %>%
+  summary(unit = "ms") %>% select(expr, median) %>%
+  mutate(ratio = median / min(median)) %>%
+  arrange(median) %>% knitr::kable(digits = 2)
 ```
 
 An alternative to for-loops are the C++ standard library algorithms. These are generally difficult to use with multidimensional data. This is why I wrote **strider**. For multidimensional data, we need to iterate over the columns, then the rows. To do this, we construct a **strided_pointer** that skips to the first element of each column. From there, we can accumulate the values easily. The standard library algorithms required are ```transform``` and ```accumulate```. 
@@ -132,8 +138,10 @@ The main functions above are ```stri_begin``` and ```stri_end```, which create s
 
 ```{r}
 x = matrix(rnorm(1e6), 1e3)
-mb = microbenchmark(colSums(x), indx_col_sum(x), stri_col_sum(x))
-print(mb, "ms", "median", 2)
+microbenchmark(colSums(x), indx_col_sum(x), stri_col_sum(x)) %>%
+  summary(unit = "ms") %>% select(expr, median) %>%
+  mutate(ratio = median / min(median)) %>%
+  arrange(median) %>% knitr::kable(digits = 2)
 ```
 
 This version is in a dead-heat with the built-in ```colSums``` function.
@@ -177,8 +185,10 @@ We are still looping over columns first, which is more efficient, yet this is st
  
 ```{r}
 x = matrix(rnorm(1e6), 1e3)
-mb = microbenchmark(rowSums(x), indx_row_sum(x))
-print(mb, "ms", "median", 2)
+microbenchmark(rowSums(x), indx_row_sum(x)) %>%
+  summary(unit = "ms") %>% select(expr, median) %>%
+  mutate(ratio = median / min(median)) %>%
+  arrange(median) %>% knitr::kable(digits = 2)
 ```
 
 As before, we can reimplement using **strider** and the standard library algorithms. A naive implementation will stride over the rows, then columns.
@@ -215,8 +225,11 @@ if (!identical(stri_row_sum(x), rowSums(x)))
 While this code is compact, notice that the strided pointer is in the inner loop. This non-sequential memory access will slow down the algorithm.
 
 ```{r}
-mb = microbenchmark(stri_row_sum(x), rowSums(x), indx_row_sum(x))
-print(mb, "ms", "median", 2)
+x = matrix(rnorm(1e6), 1e3)
+microbenchmark(stri_row_sum(x), rowSums(x), indx_row_sum(x)) %>%
+  summary(unit = "ms") %>% select(expr, median) %>%
+  mutate(ratio = median / min(median)) %>%
+  arrange(median) %>% knitr::kable(digits = 2)
 ```
 
 The results are not bad, matching the timing of R's built-in ```rowSums```, but is still twice as slow as summing columns owing to the skipping over rows.
@@ -260,9 +273,12 @@ if (!identical(stri_row_sum2(x), rowSums(x)))
 This code is similar to the column summing algorithm in that the inner loop is sequential access. The outer ```for_each``` loop jumps to the top of each column, while the inner ```transform``` loop scans the rows and adds the values to the running sums stored in the result vector.
 
 ```{r}
-mb = microbenchmark(stri_row_sum(x), rowSums(x),
-                    indx_row_sum(x), stri_row_sum2(x))
-print(mb, "ms", "median", 2)
+x = matrix(rnorm(1e6), 1e3)
+microbenchmark(stri_row_sum(x), rowSums(x),
+               indx_row_sum(x), stri_row_sum2(x)) %>%
+  summary(unit = "ms") %>% select(expr, median) %>%
+  mutate(ratio = median / min(median)) %>%
+  arrange(median) %>% knitr::kable(digits = 2)
 ```
 
 The speed-up is quite remarkable, roughly three times faster than R's native ```rowSums``` and even faster than R's built-in ```colSums``` function. The performance is due to excellent locality and, perhaps, the ```for_each``` loop was unrolled by the compiler. Notice that the inner-loop ends exactly at the next position of the outer-loop, perhaps allowing some additional optimization.
@@ -308,9 +324,12 @@ if (!identical(stri_col_sum2(x), colSums(x)))
 The 0-stride iterator uses ```y``` to accumulate the column sum and this is returned and assigned to ```rptr```, which is iterated forward for each column.
 
 ```{r}
-mb = microbenchmark(colSums(x), indx_col_sum(x),
-                    stri_col_sum(x), stri_col_sum2(x))
-print(mb, "ms", "median", 2)
+x = matrix(rnorm(1e6), 1e3)
+microbenchmark(colSums(x), indx_col_sum(x),
+               stri_col_sum(x), stri_col_sum2(x)) %>%
+  summary(unit = "ms") %>% select(expr, median) %>%
+  mutate(ratio = median / min(median)) %>%
+  arrange(median) %>% knitr::kable(digits = 2)
 ```
 
 This version is no more efficient than the ```accumulate``` version. Perhaps there is something intrinsicly faster about row sums, or, more likely, the compiler handles ```for_each``` very efficiently. Figure 1. plots the observed runtimes for comparison.
@@ -318,6 +337,7 @@ This version is no more efficient than the ```accumulate``` version. Perhaps the
 
 ```{r fig.width = 6, fig.height = 4}
 library(ggplot2)
+x = matrix(rnorm(1e6), 1e3)
 mb = microbenchmark(stri_row_sum2(x), stri_row_sum(x), rowSums(x),
                     colSums(x), stri_col_sum(x), stri_col_sum2(x),
                     indx_row_sum(x), indx_col_sum(x))
