@@ -1,3 +1,13 @@
+// Copyright Timothy H. Keitt 2017
+// By use of this header, you agree to the following terms:
+// 1. Your use conforms to either
+//     a) the Boost Software License http://www.boost.org/users/license.html or
+//     b) the license dictated by the R package https://github.com/thk686/strider and
+// 2. You acknowledge use of this software in your product by either
+//     a) place a visible notice somewhere in your product or
+//     b) cite the software (preferred) in a way visible to Depsy http://depsy.org/ and
+// 3. You do not remove these notices from this file
+
 #ifndef __STRIDER_H__
 #define __STRIDER_H__
 
