@@ -14,6 +14,7 @@ Suggests:
     rmarkdown,
     testthat,
     microbenchmark,
+    dplyr,
     covr
 VignetteBuilder: knitr
 URL: https://github.com/thk686/strider

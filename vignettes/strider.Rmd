@@ -91,7 +91,7 @@ if (!identical(indx_col_sum(x), colSums(x)))
 This code is suboptimal for a number of reasons. For one, each vector and matrix access requires computing pointer offsets into the underlying buffer. The results below show that this implementation is much slower than R's built-in ```colSums``` function.
 
 ```{r message=FALSE, warning=FALSE}
-library(tidyverse)
+library(dplyr)
 library(microbenchmark)
 ```
 
