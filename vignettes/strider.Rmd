@@ -52,6 +52,7 @@ header_file = "vignette.h"
 cat(header_code, file = file.path(tempdir(), header_file))
 pkg_cppflags = Sys.getenv("PKG_CPPFLAGS")
 pkg_cppflags = paste(pkg_cppflags, paste0("-I\"", tempdir(), "\""))
+pkg_cppflags = paste(pkg_cppflags, "-DSTRIDER_USE_THROW")
 Sys.setenv(PKG_CPPFLAGS = pkg_cppflags)
 ```
 

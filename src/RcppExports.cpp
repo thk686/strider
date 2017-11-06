@@ -28,10 +28,42 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// test_throw_equal
+void test_throw_equal();
+RcppExport SEXP _strider_test_throw_equal() {
+BEGIN_RCPP
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    test_throw_equal();
+    return R_NilValue;
+END_RCPP
+}
+// test_throw_distance1
+int test_throw_distance1();
+RcppExport SEXP _strider_test_throw_distance1() {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    rcpp_result_gen = Rcpp::wrap(test_throw_distance1());
+    return rcpp_result_gen;
+END_RCPP
+}
+// test_throw_distance2
+int test_throw_distance2();
+RcppExport SEXP _strider_test_throw_distance2() {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    rcpp_result_gen = Rcpp::wrap(test_throw_distance2());
+    return rcpp_result_gen;
+END_RCPP
+}
 
 static const R_CallMethodDef CallEntries[] = {
     {"_strider_row_sums", (DL_FUNC) &_strider_row_sums, 1},
     {"_strider_col_sums", (DL_FUNC) &_strider_col_sums, 1},
+    {"_strider_test_throw_equal", (DL_FUNC) &_strider_test_throw_equal, 0},
+    {"_strider_test_throw_distance1", (DL_FUNC) &_strider_test_throw_distance1, 0},
+    {"_strider_test_throw_distance2", (DL_FUNC) &_strider_test_throw_distance2, 0},
     {NULL, NULL, 0}
 };
 

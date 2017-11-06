@@ -11,8 +11,15 @@
 #ifndef __STRIDER_H__
 #define __STRIDER_H__
 
-#include <cassert>
 #include <boost/iterator/iterator_facade.hpp>
+
+#ifdef STRIDER_USE_THROW
+#include <stdexcept>
+#define stri_assert(x) if(!(x)) throw std::runtime_error(#x)
+#else
+#include <cassert>
+#define stri_assert(x) assert(x)
+#endif
 
 namespace strider {
 namespace detail {
@@ -46,14 +53,14 @@ private:
   
   ptrdiff_t distance_to(strided_pointer<T> const& other) const
   { 
-    assert(other.m_stride == m_stride);
-    assert((other.m_ptr - m_ptr) % m_stride == 0);
+    stri_assert(other.m_stride == m_stride);
+    stri_assert((other.m_ptr - m_ptr) % m_stride == 0);
     return (other.m_ptr - m_ptr) / m_stride;
   }
   
   bool equal(strided_pointer<T> const& other) const
   {
-    assert(other.m_stride == m_stride);
+    stri_assert(other.m_stride == m_stride);
     return m_ptr == other.m_ptr;
   }
   
@@ -95,6 +102,16 @@ make_stri_range(T* ptr, ptrdiff_t stride, ptrdiff_t strides)
 {
   return stri_range<T>(ptr, stride, strides);
 }
+
+// recursive transform
+// nd_trans(begin_extents, end_extents, margins, data, output, closure)
+// if (distance(begin_extents, end_extents) == 1)
+//   transform(data, data + *begin_extents, output, closure)
+// else
+//   stride = accumulate(begin_extents + 1, end_extents, product)
+//   for_each(stri_begin(data, stride), stri_end(data, stride, *begin_extents)
+//            [](x)) nd_transform(begin_extents + 1, end_extents, margins, &x, closure)
+//
 
 }; // namespace detail
 
