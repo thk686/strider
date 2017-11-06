@@ -21,9 +21,9 @@ The **strided_pointer** template is as minimalist as possible. It inherits from 
 
 ## Usage
 
-The **strided_pointer** and related functions are designed to be used in C++ code. I first create a header to avoid some repetitive code declarations. Unfortunately, Rcpp attributes cannot be used in a header and are included in the code examples below. The dependency on BH is only to fix a problem with Travis CI.
+The **strided_pointer** and related functions are designed to be used in C++ code. I first create a header to avoid some repetitive code declarations. Unfortunately, Rcpp attributes cannot be used in a header and are included in the code examples below. The dependency on BH is only to fix a problem with Travis CI. For sake of brevity, the header contents are omitted here. They can be found in the original markdown file.
 
-```{r}
+```{r echo=FALSE}
 header_code = '
 #include <Rcpp.h>
 using Rcpp::stop;
@@ -57,7 +57,7 @@ Sys.setenv(PKG_CPPFLAGS = pkg_cppflags)
 
 ### Column sums
 
-As a minimal example, consider computing the column sums of a matrix. Many authors familiar with R or C would implement this using for-loops.
+As a minimal example, consider computing the column sums of a matrix. Many authors familiar with C would implement this using for-loops.
 
 ```{Rcpp}
 // [[Rcpp::depends(BH)]]
@@ -78,20 +78,21 @@ NumericVector indx_col_sum(const NumericMatrix& x)
       res(c) += x(r, c);
   return res;
 }
+```
 
-/*** R
+```{r echo=FALSE}
 local({
 x = matrix(1:1e4, 1e2)
 if (!identical(indx_col_sum(x), colSums(x)))
   stop("indx_col_sum is incorrect")
 })
-*/
 ```
 
 This code is suboptimal for a number of reasons. For one, each vector and matrix access requires computing pointer offsets into the underlying buffer. The results below show that this implementation is much slower than R's built-in ```colSums``` function.
 
 ```{r message=FALSE, warning=FALSE}
 library(dplyr)
+library(ggplot2)
 library(microbenchmark)
 ```
 
@@ -124,14 +125,14 @@ NumericVector stri_col_sum(const NumericMatrix& x)
             [&](const double& v){ return accumulate(&v, &v + nr, 0.0); });
   return res;
 }
+```
 
-/*** R
+```{r echo=FALSE}
 local({
 x = matrix(1:1e4, 1e2)
 if (!identical(stri_col_sum(x), colSums(x)))
   stop("stri_col_sum is incorrect")
 })
-*/
 ```
 
 The main functions above are ```stri_begin``` and ```stri_end```, which create starting and ending iterators over the columns of data. This is a fairly efficient implementation as shown below.
@@ -171,14 +172,14 @@ NumericVector indx_row_sum(const NumericMatrix& x)
       res(r) += x(r, c);
   return res;
 }
+```
 
-/*** R
+```{r echo=FALSE}
 local({
 x = matrix(1:1e4, 1e2)
 if (!identical(indx_row_sum(x), rowSums(x)))
   stop("indx_row_sum is incorrect")
 })
-*/
 ```
 
 We are still looping over columns first, which is more efficient, yet this is still a slow implementation.
@@ -212,14 +213,14 @@ NumericVector stri_row_sum(const NumericMatrix& x)
     return accumulate(stri_begin(&v, nr), stri_end(&v, nr, nc), 0.0); });
   return res;
 }
+```
 
-/*** R
+```{r echo=FALSE}
 local({
 x = matrix(1:1e4, 1e2)
 if (!identical(stri_row_sum(x), rowSums(x)))
   stop("stri_row_sum is incorrect")
 })
-*/
 ```
 
 While this code is compact, notice that the strided pointer is in the inner loop. This non-sequential memory access will slow down the algorithm.
@@ -260,14 +261,14 @@ NumericVector stri_row_sum2(const NumericMatrix& x)
                          return a + b; });});
   return res;
 }
+```
 
-/*** R
+```{r echo=FALSE}
 local({
 x = matrix(1:1e4, 1e2)
 if (!identical(stri_row_sum2(x), rowSums(x)))
   stop("stri_row_sum2 is incorrect")
 })
-*/
 ```
 
 This code is similar to the column summing algorithm in that the inner loop is sequential access. The outer ```for_each``` loop jumps to the top of each column, while the inner ```transform``` loop scans the rows and adds the values to the running sums stored in the result vector.
@@ -311,14 +312,14 @@ NumericVector stri_col_sum2(const NumericMatrix& x)
               return y; });
   return res;
 }
+```
 
-/*** R
+```{r echo=FALSE}
 local({
 x = matrix(1:1e4, 1e2)
 if (!identical(stri_col_sum2(x), colSums(x)))
   stop("stri_col_sum2 is incorrect")
 })
-*/
 ```
 
 The 0-stride iterator uses ```y``` to accumulate the column sum and this is returned and assigned to ```rptr```, which is iterated forward for each column.
