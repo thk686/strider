@@ -13,7 +13,7 @@ col_sums(x)
 \item{x}{a numeric matrix}
 }
 \description{
-Very fast row sums
+Demonstration of fast row sums in C++
 
 Column sums using C++ standard library and strider
 }
@@ -22,4 +22,9 @@ A very efficient row summing algorithm that demonstrates
 the use of the strided pointer concept. The \code{row_sum} algorithm is
 roughly twice as fast as \code{\link{rowSums}}. The \code{col_sum} algorithm 
 matches \code{\link{colSums}} for speed.
+}
+\examples{
+row_sums(matrix(1:9, 3))
+col_sums(matrix(1:9, 3))
+
 }

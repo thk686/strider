@@ -3,7 +3,7 @@
 
 #' Fast row sums
 #' 
-#' Very fast row sums
+#' Demonstration of fast row sums in C++
 #' 
 #' @param x a numeric matrix
 #' 
@@ -12,6 +12,10 @@
 #' roughly twice as fast as \code{\link{rowSums}}. The \code{col_sum} algorithm 
 #' matches \code{\link{colSums}} for speed.
 #'
+#' @examples
+#' row_sums(matrix(1:9, 3))
+#' col_sums(matrix(1:9, 3))
+#' 
 #' @rdname sums
 #' @export
 row_sums <- function(x) {
@@ -26,5 +30,17 @@ row_sums <- function(x) {
 #' @export
 col_sums <- function(x) {
     .Call(`_strider_col_sums`, x)
+}
+
+test_throw_equal <- function() {
+    invisible(.Call(`_strider_test_throw_equal`))
+}
+
+test_throw_distance1 <- function() {
+    .Call(`_strider_test_throw_distance1`)
+}
+
+test_throw_distance2 <- function() {
+    .Call(`_strider_test_throw_distance2`)
 }
 

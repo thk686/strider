@@ -5,14 +5,23 @@
 //     b) the license dictated by the R package https://github.com/thk686/strider and
 // 2. You acknowledge use of this software in your product by either
 //     a) place a visible notice somewhere in your product or
-//     b) cite the software (preferred) in a way visible to Depsy http://depsy.org/ and
+//     b) cite the software as you would any R package and
 // 3. You do not remove these notices from this file
 
 #ifndef __STRIDER_H__
 #define __STRIDER_H__
 
-#include <cassert>
+#include <functional>
+
 #include <boost/iterator/iterator_facade.hpp>
+
+#ifdef STRIDER_USE_THROW
+#include <stdexcept>
+#define stri_assert(x) if(!(x)) throw std::runtime_error(#x)
+#else
+#include <cassert>
+#define stri_assert(x) assert(x)
+#endif
 
 namespace strider {
 namespace detail {
@@ -46,14 +55,14 @@ private:
   
   ptrdiff_t distance_to(strided_pointer<T> const& other) const
   { 
-    assert(other.m_stride == m_stride);
-    assert((other.m_ptr - m_ptr) % m_stride == 0);
+    stri_assert(other.m_stride == m_stride);
+    stri_assert((other.m_ptr - m_ptr) % m_stride == 0);
     return (other.m_ptr - m_ptr) / m_stride;
   }
   
   bool equal(strided_pointer<T> const& other) const
   {
-    assert(other.m_stride == m_stride);
+    stri_assert(other.m_stride == m_stride);
     return m_ptr == other.m_ptr;
   }
   
@@ -95,6 +104,22 @@ make_stri_range(T* ptr, ptrdiff_t stride, ptrdiff_t strides)
 {
   return stri_range<T>(ptr, stride, strides);
 }
+
+using std::next;
+using std::multiplies;
+using std::iterator_traits;
+
+template<typename T, typename U, typename V>
+void kd_for_each(T data, U ext_begin, U ext_end, V fntr){
+  auto next_ext = next(ext_begin);
+  if (next_ext == ext_end){
+    for_each(data, data + *ext_begin, fntr);}
+  else{
+    auto stride = accumulate(next_ext, ext_end, 1, multiplies<U>());
+    for_each(stri_begin(data, stride),
+             stri_end(data, stride, *ext_begin),
+             [&](const decltype(*data)& x){ 
+               kd_for_each(&x, next_ext, ext_end, fntr);});}}
 
 }; // namespace detail
 

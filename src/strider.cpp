@@ -11,10 +11,9 @@ using std::accumulate;
 using strider::stri_begin;
 using strider::stri_end;
 
-
 //' Fast row sums
 //' 
-//' Very fast row sums
+//' Demonstration of fast row sums in C++
 //' 
 //' @param x a numeric matrix
 //' 
@@ -23,6 +22,10 @@ using strider::stri_end;
 //' roughly twice as fast as \code{\link{rowSums}}. The \code{col_sum} algorithm 
 //' matches \code{\link{colSums}} for speed.
 //'
+//' @examples
+//' row_sums(matrix(1:9, 3))
+//' col_sums(matrix(1:9, 3))
+//' 
 //' @rdname sums
 //' @export
 // [[Rcpp::export]]
