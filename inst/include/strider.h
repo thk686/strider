@@ -5,11 +5,13 @@
 //     b) the license dictated by the R package https://github.com/thk686/strider and
 // 2. You acknowledge use of this software in your product by either
 //     a) place a visible notice somewhere in your product or
-//     b) cite the software (preferred) in a way visible to Depsy http://depsy.org/ and
+//     b) cite the software as you would any R package and
 // 3. You do not remove these notices from this file
 
 #ifndef __STRIDER_H__
 #define __STRIDER_H__
+
+#include <functional>
 
 #include <boost/iterator/iterator_facade.hpp>
 
@@ -103,36 +105,21 @@ make_stri_range(T* ptr, ptrdiff_t stride, ptrdiff_t strides)
   return stri_range<T>(ptr, stride, strides);
 }
 
-// recursive transform
-// nd_trans(begin_extents, end_extents, margins, data, output, closure)
-// if (distance(begin_extents, end_extents) == 1)
-//   transform(data, data + *begin_extents, output, closure)
-// else
-//   stride = accumulate(begin_extents + 1, end_extents, product)
-//   for_each(stri_begin(data, stride), stri_end(data, stride, *begin_extents)
-//            [](x)) nd_transform(begin_extents + 1, end_extents, margins, &x, closure)
-//
-
 using std::next;
 using std::multiplies;
+using std::iterator_traits;
 
-template<typename T, typename U>
-nd_transform(T* data, U* extents_begin, U* extents_end)
-{
-  if (next(extents_begin) == extents_end)
-  {
-    
-  }
-  else
-  {
-    auto stride = accumulate(next(extents_begin), extents_end, 1, multiplies<U>);
+template<typename T, typename U, typename V>
+void kd_for_each(T data, U ext_begin, U ext_end, V fntr){
+  auto next_ext = next(ext_begin);
+  if (next_ext == ext_end){
+    for_each(data, data + *ext_begin, fntr);}
+  else{
+    auto stride = accumulate(next_ext, ext_end, 1, multiplies<U>());
     for_each(stri_begin(data, stride),
-             stri_end(data, stride, *extents_begin),
-             [&](const T& x){
-               return nd_transform(&x, next(extents_begin), extents_end); });
-  }
-  
-}
+             stri_end(data, stride, *ext_begin),
+             [&](const decltype(*data)& x){ 
+               kd_for_each(&x, next_ext, ext_end, fntr);});}}
 
 }; // namespace detail
 

@@ -5,7 +5,12 @@ Version: 1.0
 Date: 2017-11-03
 Author: Tim Keitt
 Maintainer: Tim Keitt <tkeitt@gmail.com>
-Description: The strided pointer adapts legacy buffers to the C++ standard library and range-based for-loops.
+Description: The strided pointer adapts legacy buffers to the C++ standard library
+  and range-based for-loops. Given a pointer into a multidimensional data buffer,
+  one can generate an interator range using stri_begin and stri_end, strided version
+  of the standard libraries begin and end. For constructing range-based for-loops,
+  a stri_range class is provided. These help authors avoid integer-based indexing,
+  which can impede algorithm performance.
 License: GPL (>= 2)
 Imports: Rcpp (>= 0.12.13)
 LinkingTo: Rcpp, BH
