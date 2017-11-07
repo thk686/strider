@@ -105,22 +105,6 @@ make_stri_range(T* ptr, ptrdiff_t stride, ptrdiff_t strides)
   return stri_range<T>(ptr, stride, strides);
 }
 
-using std::next;
-using std::multiplies;
-using std::iterator_traits;
-
-template<typename T, typename U, typename V>
-void kd_for_each(T data, U ext_begin, U ext_end, V fntr){
-  auto next_ext = next(ext_begin);
-  if (next_ext == ext_end){
-    for_each(data, data + *ext_begin, fntr);}
-  else{
-    auto stride = accumulate(next_ext, ext_end, 1, multiplies<U>());
-    for_each(stri_begin(data, stride),
-             stri_end(data, stride, *ext_begin),
-             [&](const decltype(*data)& x){ 
-               kd_for_each(&x, next_ext, ext_end, fntr);});}}
-
 }; // namespace detail
 
 using detail::stri_end;
