@@ -58,9 +58,9 @@ pkg_cppflags = paste(pkg_cppflags, paste0("-I\"", tempdir(), "\""))
 Sys.setenv(PKG_CPPFLAGS = pkg_cppflags)
 ```
 
-### Convolution
+### Replacing index loops with standard library algorithms
 
-As a prelude to using the **strided_pointer** class, I start out with an example of vector convolution because it is one of the original examples in the [Rcpp](https://github.com/RcppCore/Rcpp) documentation. The code below appears to be Rcpp's 14th revision of this algorithm fully optimized for speed.
+As a prelude to using the **strided_pointer** class, I start out with an example of vector convolution because it is one of the original examples in the [Rcpp](https://github.com/RcppCore/Rcpp) documentation, which I have copied here.
 
 ```{Rcpp}
 // [[Rcpp::depends(BH)]]
@@ -70,23 +70,27 @@ As a prelude to using the **strided_pointer** class, I start out with an example
 #include <vignette.h>
 
 // [[Rcpp::export]]
-SEXP convolve14cpp(SEXP a, SEXP b){
-    NumericVector xa(a), xb(b);
-    int n_xa = xa.size() ;
-    int n_xb = xb.size() ;
-    int nab = n_xa + n_xb - 1;
-    NumericVector xab(nab);
-    Fast<NumericVector> fa(xa), fb(xb), fab(xab) ;
-
-    for (int i = 0; i < n_xa; i++)
-        for (int j = 0; j < n_xb; j++)
-            fab[i + j] += fa[i] * fb[j];
-
-    return xab;
+NumericVector
+convolve_cpp(const NumericVector& a,
+             const NumericVector& b) {
+  // Declare loop counters, and vector sizes
+  int i, j,
+      na = a.size(), nb = b.size(),
+      nab = na + nb - 1;
+  // Create vector filled with 0
+  NumericVector ab(nab);
+  // Crux of the algorithm
+  for(i = 0; i < na; i++) {
+    for(j = 0; j < nb; j++) {
+          ab[i + j] += a[i] * b[j];
+    }
+  }
+  // Return result
+  return ab;
 }
 ```
 
-The Fast vector type is a very lightweight wrapper around a data buffer designed to minimize the overhead of integer indexing. The next code block shows my translation using the standard library transform algorithm. This version eschews integer indexes for incrementing iterators along the input and output vectors.
+The next code block shows my translation using the standard library transform algorithm. This version eschews integer indexes for incrementing iterators along the input and output vectors.
 
 ```{Rcpp}
 // [[Rcpp::depends(BH)]]
@@ -96,33 +100,36 @@ The Fast vector type is a very lightweight wrapper around a data buffer designed
 #include <vignette.h>
 
 // [[Rcpp::export]]
-SEXP stl_algo_convolve(SEXP a, SEXP b){
-    NumericVector xa(a), xb(b);
-    int n_xa = xa.size() ;
-    int n_xb = xb.size() ;
-    int nab = n_xa + n_xb - 1;
-    NumericVector xab(nab);
-
-    transform(begin(xa), end(xa),
-              begin(xab), begin(xab),
-              [&](const double& t, double& u){
-                transform(begin(xb), end(xb), &u, &u,
-                          [&](const double& v, const double& w){
-                            return w + t * v; });
-                return u; });
-
-    return xab;
+NumericVector
+stl_algo_convolve(const NumericVector& a,
+                  const NumericVector& b) {
+  // Declare vector sizes
+  int
+    na = a.size(), nb = b.size(), 
+    nab = na + nb - 1;
+  // Create vector filled with 0
+  NumericVector ab(nab);
+  // Crux of the algorithm
+  transform(begin(a), end(a),
+            begin(ab), begin(ab),
+            [&](const double& t, double& u){
+              transform(begin(b), end(b), &u, &u,
+                        [&](const double& v, const double& w){
+                          return w + t * v; });
+              return u; });
+  // Return result
+  return ab;
 }
 ```
 
 ```{r, echo=FALSE}
 a = sample(1:1e2)
 b = sample(1:1e2)
-if (!identical(convolve14cpp(a, b), stl_algo_convolve(a, b)))
+if (!identical(convolve_cpp(a, b), stl_algo_convolve(a, b)))
   stop("stl_algo_convolve is incorrect")
 ```
 
-While in this particular case, the code is more complicated and a bit more difficult to reason about, replacing explicit loops with standard library algorithms is considered a best-practice that is less susceptible to indexing errors and buffer overruns.
+While in this particular case the code is a bit more complicated, replacing explicit loops with standard library algorithms is considered a best-practice that is less susceptible to indexing errors and buffer overruns.
 
 ```{r message=FALSE, warning=FALSE}
 library(dplyr)
@@ -133,15 +140,15 @@ library(microbenchmark)
 ```{r}
 a = sample(1:1e3)
 b = sample(1:1e3)
-microbenchmark(convolve14cpp(a, b), stl_algo_convolve(a, b)) %>%
+microbenchmark(convolve_cpp(a, b), stl_algo_convolve(a, b)) %>%
   summary(unit = "ms") %>% select(expr, median) %>%
   mutate(ratio = median / min(median)) %>%
   arrange(median) %>% knitr::kable(digits = 2)
 ```
 
-The transform version is perhaps 10% faster than the optimized Rcpp example. (These results will likely change on different computers and with different compilers.) Not a big gain, but nonetheless remarkable for a first try right out of the gate. Generally an iterator-based approach will meet or exceed the efficiency of for-loops with integer offsets. In the following, I show out the **strider** package can assist authors in avoiding explicit for-loops when scanning multidimensional buffers.
+The two algorithms are roughly the same in efficiency. (These results will likely change on different computers and with different compilers.) Generally an iterator-based approach will meet or exceed the efficiency of for-loops with integer offsets while avoiding potential errors in indexing code. In the following, I show out the **strider** package can assist authors in avoiding explicit for-loops when scanning multidimensional buffers.
 
-### Column sums
+### Striding over matrix margins
 
 As a minimal example, consider computing the column sums of a matrix. Many authors familiar with C would implement this using for-loops.
 
@@ -225,7 +232,7 @@ microbenchmark(colSums(x), indx_col_sum(x), stri_col_sum(x)) %>%
   arrange(median) %>% knitr::kable(digits = 2)
 ```
 
-This version is in a dead-heat with the built-in ```colSums``` function.
+This version is in a dead-heat with R's internal C function ```colSums```.
 
 ### Row sums
 
@@ -482,7 +489,7 @@ stri_loop_range_3(x)
 
 ## Conclusions
 
-Experimenting with the C++ standard library algorithms demonstrates that they are often highly efficient and, in some cases, faster than corresponding native R algorithms. However using the standard library algorithms with multidimensional data is challenging and it is quite common for authors to resort to index-based for-loops, which can impede performance.
+Experimenting with the C++ standard library algorithms demonstrates that they are often highly efficient and, in some cases, faster than corresponding native R algorithms. However using the standard library algorithms with multidimensional data is challenging and it is quite common for authors to resort to index-based for-loops, which can impede performance and risk indexing errors.
 
 The **strider** package provides a lightweight pointer-adapter that makes using the standard library algorithms straightforward with multidimensional buffers accessible via a pointer. As long as one knows the dimensions and the memory layout of the data, then any dimension can be scanned by computing a stride and number of strides. When it is possible to scan the data sequentially, maximum performance is attained. Owning to the large number of legacy libraries whose APIs pass raw pointers to structured buffers, I expect that **strider** may find a wide range of applications while also improving code reliability and comprehension.
 

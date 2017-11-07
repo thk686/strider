@@ -13,9 +13,7 @@ col_sums(x)
 \item{x}{a numeric matrix}
 }
 \description{
-Demonstration of fast row sums in C++
-
-Column sums using C++ standard library and strider
+Demonstration of fast row and columns sums in C++
 }
 \details{
 A very efficient row summing algorithm that demonstrates

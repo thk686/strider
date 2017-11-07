@@ -8,10 +8,11 @@
 \description{
 The strided pointer adapts legacy buffers to the C++ standard library
 and range-based for-loops. Given a pointer into a multidimensional data buffer,
-one can generate an interator range using stri_begin and stri_end, strided version
-of the standard libraries begin and end. For constructing range-based for-loops,
+one can generate an interator range using stri_begin and stri_end, strided versions
+of the standard library's begin and end. For constructing range-based for-loops,
 a stri_range class is provided. These help authors avoid integer-based indexing,
-which can impede algorithm performance.
+which can impede algorithm performance. This library exists primarily to expose
+the header file to other R projects.
 }
 \seealso{
 Useful links:

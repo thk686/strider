@@ -13,7 +13,7 @@ using strider::stri_end;
 
 //' Fast row sums
 //' 
-//' Demonstration of fast row sums in C++
+//' Demonstration of fast row and columns sums in C++
 //' 
 //' @param x a numeric matrix
 //' 
@@ -46,10 +46,6 @@ NumericVector row_sums(const NumericMatrix& x)
   return res;
 }
 
-//' Fast column sums
-//' 
-//' Column sums using C++ standard library and strider
-//' 
 //' @rdname sums
 //' @export
 // [[Rcpp::export]]
