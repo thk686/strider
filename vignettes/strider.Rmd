@@ -168,7 +168,7 @@ NumericVector indx_col_sum(const NumericMatrix& x)
   NumericVector res(nc, 0.0);
   for (int c = 0; c != nc; ++c)
     for (int r = 0; r != nr; ++r)
-      res(c) += x(r, c);
+      res[c] += x(r, c);
   return res;
 }
 ```
@@ -256,7 +256,7 @@ NumericVector indx_row_sum(const NumericMatrix& x)
   NumericVector res(nr, 0.0);
   for (int c = 0; c != nc; ++c)
     for (int r = 0; r != nr; ++r)
-      res(r) += x(r, c);
+      res[r] += x(r, c);
   return res;
 }
 ```
@@ -320,7 +320,7 @@ microbenchmark(stri_row_sum(x), rowSums(x), indx_row_sum(x)) %>%
   arrange(median) %>% knitr::kable(digits = 2)
 ```
 
-The results are not bad, matching the timing of R's built-in ```rowSums```, but is still twice as slow as summing columns owing to the skipping over rows. (Timings appear to depend on the particular machine; the strided row sum is relatively much slower on my desktop than on my laptop.)
+The results are not bad, matching the timing of R's built-in ```rowSums```, but is still twice as slow as summing columns owing to the skipping over rows.
 
 An optimal version of this algorithm would iterate over the matrix in column-major order to avoid non-sequential memory access. For that, we need the binary-function version of ```transform```.
 
