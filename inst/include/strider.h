@@ -13,105 +13,131 @@
 
 #include <functional>
 
-#include <boost/iterator/iterator_facade.hpp>
-
-#ifdef STRIDER_USE_THROW
-#include <stdexcept>
-#define stri_assert(x) if(!(x)) throw std::runtime_error(#x)
-#else
-#include <cassert>
-#define stri_assert(x) assert(x)
-#endif
+#include <boost/iterator/iterator_adaptor.hpp>
 
 namespace strider {
 namespace detail {
 
-using boost::iterator_facade;
-using boost::random_access_traversal_tag;
+using boost::iterator_adaptor;
+using boost::enable_if_convertible;
 using boost::iterator_core_access;
 
-using std::ptrdiff_t;
+using std::next;
+using std::iterator_traits;
 
-template<typename T>
-class strided_pointer :
-  public iterator_facade<strided_pointer<T>, T,
-                         random_access_traversal_tag>
+template <class Iterator>
+class strided_iterator
+  : public iterator_adaptor<strided_iterator<Iterator>, Iterator>
 {
-public:
-  strided_pointer()
-    : m_ptr(nullptr), m_stride(0) {}
+  using super_t = iterator_adaptor<strided_iterator<Iterator>, Iterator>;
   
-  strided_pointer(T* ptr, ptrdiff_t stride)
-    : m_ptr(ptr), m_stride(stride) {}
-  
-private:
   friend class iterator_core_access;
   
-  void increment() { m_ptr += m_stride; }
+public:
+  using difference_type = typename super_t::difference_type;
+  using value_type = typename super_t::value_type;
+  using pointer = typename super_t::pointer;
+  using reference = typename super_t::reference;
+  using iterator_category = typename super_t::iterator_category;
   
-  void decrement() { m_ptr -= m_stride; }
+  strided_iterator() {}
   
-  void advance(ptrdiff_t n) { m_ptr += n * m_stride; }
+  explicit strided_iterator(Iterator x, difference_type stride)
+    : super_t(x), m_stride(stride) {}
   
-  ptrdiff_t distance_to(strided_pointer<T> const& other) const
-  { 
-    stri_assert(other.m_stride == m_stride);
-    stri_assert((other.m_ptr - m_ptr) % m_stride == 0);
-    return (other.m_ptr - m_ptr) / m_stride;
-  }
+  template<class OtherIterator>
+  strided_iterator(
+    strided_iterator<OtherIterator> const& r,
+    typename enable_if_convertible<OtherIterator, Iterator>::type* = 0) 
+    : super_t(r.base()), m_stride(r.m_stride) {}
   
-  bool equal(strided_pointer<T> const& other) const
-  {
-    stri_assert(other.m_stride == m_stride);
-    return m_ptr == other.m_ptr;
-  }
-  
-  T& dereference() const { return *m_ptr; }
-  
-  T* m_ptr;
-  ptrdiff_t m_stride;
-};
-
-template<typename T>
-strided_pointer<T>
-stri_begin(T* ptr, ptrdiff_t stride)
-{
-  return strided_pointer<T>(ptr, stride);
-}
-
-template<typename T>
-strided_pointer<T>
-stri_end(T* ptr, ptrdiff_t stride, ptrdiff_t strides)
-{
-  return strided_pointer<T>(ptr + stride * strides, stride);
-}
-
-template<typename T>
-class stri_range
-{
-public: // add typedefs
-  stri_range(T* ptr, ptrdiff_t stride, ptrdiff_t strides)
-    : m_begin(ptr, stride), m_end(ptr + stride * strides, stride) {}
-  strided_pointer<T> begin() const { return m_begin; }
-  strided_pointer<T> end() const { return m_end; }
 private:
-  strided_pointer<T> m_begin, m_end;
+  reference dereference() const
+  {
+    return *this->base_reference();
+  }
+  
+  void increment() { std::advance(this->base_reference(),  m_stride); }
+
+  using is_bidirectional = std::is_convertible<
+    iterator_category, std::bidirectional_iterator_tag>;
+
+  typename std::enable_if<is_bidirectional::value>::type
+  decrement() { std::advance(this->base_reference(), -m_stride); }
+  
+  using is_random_access = std::is_convertible<
+    iterator_category, std::random_access_iterator_tag>;
+  
+  typename std::enable_if<is_random_access::value>::type
+  advance(difference_type n)
+  {
+    std::advance(this->base_reference(), n * m_stride);
+  }
+  
+  template <class OtherIterator>
+  typename std::enable_if<is_random_access::value, difference_type>::type
+  distance_to(strided_iterator<OtherIterator> const& y) const
+  {
+    return std::distance(this->base_reference(), y.base()) / m_stride;
+  }
+  
+  using is_input = std::is_convertible<
+    iterator_category, std::input_iterator_tag>;
+  
+  template <class OtherIterator>
+  typename std::enable_if<is_input::value, bool>::type
+  equal(strided_iterator<OtherIterator> const& y) const
+  {
+    return this->base_reference() == y.base();
+  }
+  
+  difference_type m_stride;
 };
 
 template<typename T>
-stri_range<T>
-make_stri_range(T* ptr, ptrdiff_t stride, ptrdiff_t strides)
+inline strided_iterator<T>
+make_strided(T iter,
+             typename iterator_traits<T>::difference_type stride = 0,
+             typename iterator_traits<T>::difference_type strides = 0)
 {
-  return stri_range<T>(ptr, stride, strides);
+  return strided_iterator<T>(next(iter, stride * strides), stride);
+}
+
+template<typename T>
+class strided_range
+{
+public:
+  using difference_type = typename iterator_traits<T>::difference_type;
+  strided_range(T iter, difference_type stride, difference_type strides)
+    : m_iter(iter), m_stride(stride), m_strides(strides) {}
+  strided_iterator<T> begin() const
+  {
+    return make_strided(m_iter, m_stride);
+  }
+  strided_iterator<T> end() const
+  {
+    return make_strided(m_iter, m_stride, m_strides);
+  }
+private:
+  T m_iter;
+  difference_type m_stride, m_strides;
+};
+
+template<typename T>
+inline strided_range<T>
+make_strided_range(T iter,
+                   typename iterator_traits<T>::difference_type stride,
+                   typename iterator_traits<T>::difference_type strides)
+{
+  return strided_range<T>(iter, stride, strides);
 }
 
 }; // namespace detail
 
-using detail::stri_end;
-using detail::stri_range;
-using detail::stri_begin;
-using detail::make_stri_range;
-using detail::strided_pointer;
+using detail::make_strided;
+using detail::strided_range;
+using detail::make_strided_range;
+using detail::strided_iterator;
 
 }; // namespace strider
 
