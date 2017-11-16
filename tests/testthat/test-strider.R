@@ -10,8 +10,3 @@ test_that("col_sums are correct", {
   expect_equal(col_sums(x), colSums(x))
 })
 
-test_that("will throw on error", {
-  expect_error(test_throw_equal())
-  expect_error(test_throw_distance1())
-  expect_error(test_throw_distance2())
-})
