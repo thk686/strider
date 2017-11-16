@@ -7,9 +7,10 @@ using Rcpp::NumericMatrix;
 using std::for_each;
 using std::transform;
 using std::accumulate;
+using std::begin;
+using std::end;
 #include <strider.h>
-using strider::stri_begin;
-using strider::stri_end;
+using strider::make_strided;
 
 //' Fast row sums
 //' 
@@ -31,16 +32,12 @@ using strider::stri_end;
 // [[Rcpp::export]]
 NumericVector row_sums(const NumericMatrix& x)
 {
-  auto
-    nr = x.nrow(),
-    nc = x.ncol();
+  auto nr = x.nrow();
   NumericVector res(nr, 0.0);
-  auto data = &x[0];
-  auto rptr = &res[0];
-  for_each(stri_begin(data, nr),
-           stri_end(data, nr, nc),
+  for_each(make_strided(begin(x), nr),
+           make_strided(end(x), nr),
            [&](const double& x){
-             transform(&x, &x + nr, rptr, rptr,
+             transform(&x, &x + nr, begin(res), begin(res),
                        [](const double& a, const double& b){
                          return a + b; });});
   return res;
@@ -51,12 +48,9 @@ NumericVector row_sums(const NumericMatrix& x)
 // [[Rcpp::export]]
 NumericVector col_sums(const NumericMatrix& x)
 {
-  auto
-    nr = x.nrow(),
-    nc = x.ncol();
-  auto data = &x[0];
-  NumericVector res(nc);
-  transform(stri_begin(data, nr), stri_end(data, nr, nc), &res[0],
+  auto nr = x.nrow();
+  NumericVector res(x.ncol());
+  transform(make_strided(begin(x), nr), make_strided(end(x), nr), begin(res),
             [&](const double& v){ return accumulate(&v, &v + nr, 0.0); });
   return res;
 }
