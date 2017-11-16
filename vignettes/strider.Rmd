@@ -14,7 +14,7 @@ library(dplyr)
 library(ggplot2)
 library(microbenchmark)
 
-knitr::opts_chunk$set(cache=TRUE)
+#knitr::opts_chunk$set(cache=TRUE)
 
 header_code = '
 #include <Rcpp.h>
