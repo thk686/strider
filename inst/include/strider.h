@@ -59,34 +59,22 @@ private:
   
   void increment() { std::advance(this->base_reference(),  m_stride); }
 
-  using is_bidirectional = std::is_convertible<
-    iterator_category, std::bidirectional_iterator_tag>;
-
-  typename std::enable_if<is_bidirectional::value>::type
-  decrement() { std::advance(this->base_reference(), -m_stride); }
+  void decrement() { std::advance(this->base_reference(), -m_stride); }
   
-  using is_random_access = std::is_convertible<
-    iterator_category, std::random_access_iterator_tag>;
-  
-  typename std::enable_if<is_random_access::value>::type
-  advance(difference_type n)
+  void advance(difference_type n)
   {
     std::advance(this->base_reference(), n * m_stride);
   }
   
   template <class OtherIterator>
-  typename std::enable_if<is_random_access::value, difference_type>::type
+  difference_type
   distance_to(strided_iterator<OtherIterator> const& y) const
   {
     return std::distance(this->base_reference(), y.base()) / m_stride;
   }
   
-  using is_input = std::is_convertible<
-    iterator_category, std::input_iterator_tag>;
-  
   template <class OtherIterator>
-  typename std::enable_if<is_input::value, bool>::type
-  equal(strided_iterator<OtherIterator> const& y) const
+  bool equal(strided_iterator<OtherIterator> const& y) const
   {
     return this->base_reference() == y.base();
   }
