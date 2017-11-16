@@ -28,15 +28,3 @@ col_sums <- function(x) {
     .Call(`_strider_col_sums`, x)
 }
 
-test_throw_equal <- function() {
-    invisible(.Call(`_strider_test_throw_equal`))
-}
-
-test_throw_distance1 <- function() {
-    .Call(`_strider_test_throw_distance1`)
-}
-
-test_throw_distance2 <- function() {
-    .Call(`_strider_test_throw_distance2`)
-}
-
