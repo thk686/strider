@@ -3,6 +3,7 @@ Type: Package
 Title: Strided Pointer Iterator and Range
 Version: 1.0
 Date: 2017-11-03
+Authors@R: person("Tim", "Keitt", role = c("aut", "cre"))
 Author: Tim Keitt
 Maintainer: Tim Keitt <tkeitt@gmail.com>
 Description: The strided pointer adapts legacy buffers to the C++ standard library
