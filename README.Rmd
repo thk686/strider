@@ -12,12 +12,11 @@ Adapting multidimensional legacy buffers to the C++ standard library is difficul
 This code snippet computes row sums of a matrix.
 
 ```{cpp}
-for_each(stri_begin(data, nr),
-         stri_end(data, nr, nc),
-         [&](const double& x){
-           transform(&x, &x + nr, rptr, rptr,
-                     [](const double& a, const double& b){
-                       return a + b; });});
+  for_each(make_strided(begin(x), nr), make_strided(end(x)),
+           [&](const double& y){
+             transform(&y, &y + nr, begin(res), begin(res),
+                       [](const double& a, const double& b){
+                         return a + b; });});
 ```
 
 It is cache and compiler friendly and runs nearly four times faster than R's built-in ```rowSums``` function. See the vignette for details.

@@ -184,10 +184,10 @@ microbenchmark(convolve_cpp(a, b),
   knitr::kable(digits = 1, caption = "Evaluations per second")
 ```
 
-## Usage
+## Strided_iterator and strided_range
 
 The workhorse class in the **strider** package is **strided_iterator**, which inherits from the [Boost iterator adaptor](http://www.boost.org/doc/libs/release/libs/iterator/) class. It merely advances by a specified stride when incremented. It is currently possible to use negative strides, however this is not 
-tested. The strided iterator will conform to the same iterator category and support the same expressions as the iterator that is adapted. A second class, **iterator_range** exists solely to construct begin and end iterators over a strided range.
+tested. The strided iterator will conform to the same iterator category and support the same expressions as the iterator that is adapted. A second class, **strided_range** exists solely to construct begin and end iterators over a strided range.
 
 Users will generally only need to call one or both of two auxiliary functions with the following definitions:
 
@@ -429,7 +429,7 @@ range_loop_convolve2(const NumericMatrix& a,
 }
 ```
 
-As a quick test, I see whether the convolution is invariant to the delta function as required.
+As a quick test, I check whether the convolution is invariant to the delta function as required. It should be noted that these are not the fasted algorithms for performing convolution. A more efficient implementation would never compute the same product twice. For large matricies, Fourier methods are faster still. 
 
 ```{r include=FALSE}
 local({
@@ -475,7 +475,7 @@ The strided implementation appears to have a slight advantage, however these res
 
 Experimenting with the C++ standard library algorithms demonstrates that they are often highly efficient and, in some cases, faster than corresponding native R algorithms. However using the standard library algorithms with multidimensional data is challenging and it is quite common for authors to resort to index-based for-loops, which can impede performance and risk indexing errors.
 
-The **strider** package provides a lightweight pointer-adapter that makes using the standard library algorithms straightforward with multidimensional buffers accessible via a pointer. As long as one knows the dimensions and the memory layout of the data, then any dimension can be scanned by computing a stride and number of strides. When it is possible to scan the data sequentially, maximum performance is attained. Owning to the large number of legacy libraries whose APIs pass raw pointers to structured buffers, I expect that **strider** may find a wide range of applications while also improving code reliability and comprehension.
+The **strider** package provides a lightweight iterator-adapter that makes using the standard library algorithms straightforward with multidimensional buffers accessible via a pointer or iterator. As long as one knows the dimensions and the memory layout of the data, then any dimension can be scanned by computing a stride and number of strides. When it is possible to scan the data sequentially, maximum performance is attained. Owning to the large number of legacy libraries whose APIs pass raw pointers to structured buffers, I expect that **strider** may find a wide range of applications while also improving code reliability and comprehension.
 
 ***
 
