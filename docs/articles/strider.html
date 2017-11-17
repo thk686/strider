@@ -172,18 +172,18 @@ range_loop_convolve(<span class="at">const</span> NumericVector&amp; a,
 </tr></thead>
 <tbody>
 <tr class="odd">
-<td align="left">range_loop_convolve(a, b)</td>
+<td align="left">stl_algo_convolve(a, b)</td>
 <td align="right">101.5</td>
 <td align="right">1</td>
 </tr>
 <tr class="even">
-<td align="left">stl_algo_convolve(a, b)</td>
+<td align="left">range_loop_convolve(a, b)</td>
 <td align="right">101.5</td>
 <td align="right">1</td>
 </tr>
 <tr class="odd">
 <td align="left">convolve_cpp(a, b)</td>
-<td align="right">100.9</td>
+<td align="right">100.7</td>
 <td align="right">1</td>
 </tr>
 </tbody>
@@ -267,23 +267,23 @@ NumericVector range_col_sum(<span class="at">const</span> NumericMatrix&amp; x)
 <tbody>
 <tr class="odd">
 <td align="left">strided_col_sum(x)</td>
-<td align="right">1059.5</td>
-<td align="right">1</td>
-</tr>
-<tr class="even">
-<td align="left">range_col_sum(x)</td>
-<td align="right">1034.9</td>
-<td align="right">1</td>
-</tr>
-<tr class="odd">
-<td align="left">indx_col_sum(x)</td>
-<td align="right">1026.8</td>
-<td align="right">1</td>
+<td align="right">1063.7</td>
+<td align="right">1.0</td>
 </tr>
 <tr class="even">
 <td align="left">colSums(x)</td>
-<td align="right">1022.1</td>
-<td align="right">1</td>
+<td align="right">1017.3</td>
+<td align="right">1.0</td>
+</tr>
+<tr class="odd">
+<td align="left">range_col_sum(x)</td>
+<td align="right">992.7</td>
+<td align="right">0.9</td>
+</tr>
+<tr class="even">
+<td align="left">indx_col_sum(x)</td>
+<td align="right">989.1</td>
+<td align="right">0.9</td>
 </tr>
 </tbody>
 </table>
@@ -318,8 +318,8 @@ NumericVector strided_row_sum(<span class="at">const</span> NumericMatrix&amp; x
     nr = x.nrow(),
     nc = x.ncol();
   NumericVector res(nr);
-  transform(begin(x), begin(x) + nr, begin(res), [&amp;](<span class="at">const</span> <span class="dt">double</span>&amp; v){
-    <span class="cf">return</span> accumulate(make_strided(&amp;v, nr), make_strided(&amp;v, nr, nc), <span class="fl">0.0</span>); });
+  transform(begin(x), begin(x) + nr, begin(res), [&amp;](<span class="at">const</span> <span class="dt">double</span>&amp; v)        {
+    <span class="cf">return</span> accumulate(make_strided(&amp;v, nr), make_strided(&amp;v, nr, nc), <span class="fl">0.0</span>);  });
   <span class="cf">return</span> res;
 }
 
@@ -329,10 +329,10 @@ NumericVector strided_row_sum2(<span class="at">const</span> NumericMatrix&amp; 
   <span class="kw">auto</span> nr = x.nrow();
   NumericVector res(nr, <span class="fl">0.0</span>);
   for_each(make_strided(begin(x), nr), make_strided(end(x)),
-           [&amp;](<span class="at">const</span> <span class="dt">double</span>&amp; y){
+           [&amp;](<span class="at">const</span> <span class="dt">double</span>&amp; y)                                {
              transform(&amp;y, &amp;y + nr, begin(res), begin(res),
-                       [](<span class="at">const</span> <span class="dt">double</span>&amp; a, <span class="at">const</span> <span class="dt">double</span>&amp; b){
-                         <span class="cf">return</span> a + b; });});
+                       [](<span class="at">const</span> <span class="dt">double</span>&amp; a, <span class="at">const</span> <span class="dt">double</span>&amp; b)    {
+                         <span class="cf">return</span> a + b;                         });});
   <span class="cf">return</span> res;
 }
 
@@ -361,28 +361,28 @@ NumericVector range_row_sum(<span class="at">const</span> NumericMatrix&amp; x)
 </tr></thead>
 <tbody>
 <tr class="odd">
-<td align="left">range_row_sum(x)</td>
-<td align="right">1730.2</td>
+<td align="left">strided_row_sum2(x)</td>
+<td align="right">1859.2</td>
 <td align="right">1.0</td>
 </tr>
 <tr class="even">
-<td align="left">indx_row_sum(x)</td>
-<td align="right">1682.3</td>
+<td align="left">range_row_sum(x)</td>
+<td align="right">1842.1</td>
 <td align="right">1.0</td>
 </tr>
 <tr class="odd">
-<td align="left">strided_row_sum2(x)</td>
-<td align="right">1676.1</td>
+<td align="left">indx_row_sum(x)</td>
+<td align="right">1824.5</td>
 <td align="right">1.0</td>
 </tr>
 <tr class="even">
 <td align="left">rowSums(x)</td>
-<td align="right">465.0</td>
+<td align="right">481.1</td>
 <td align="right">0.3</td>
 </tr>
 <tr class="odd">
 <td align="left">strided_row_sum(x)</td>
-<td align="right">326.3</td>
+<td align="right">406.1</td>
 <td align="right">0.2</td>
 </tr>
 </tbody>
@@ -469,12 +469,12 @@ b =<span class="st"> </span><span class="kw">matrix</span>(<span class="kw">c</s
 <tbody>
 <tr class="odd">
 <td align="left">range_loop_convolve2(a, b)</td>
-<td align="right">394.3</td>
+<td align="right">377.0</td>
 <td align="right">1.0</td>
 </tr>
 <tr class="even">
 <td align="left">convolve2_cpp(a, b)</td>
-<td align="right">327.7</td>
+<td align="right">300.6</td>
 <td align="right">0.8</td>
 </tr>
 </tbody>

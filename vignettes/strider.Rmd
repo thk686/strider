@@ -315,8 +315,8 @@ NumericVector strided_row_sum(const NumericMatrix& x)
     nr = x.nrow(),
     nc = x.ncol();
   NumericVector res(nr);
-  transform(begin(x), begin(x) + nr, begin(res), [&](const double& v){
-    return accumulate(make_strided(&v, nr), make_strided(&v, nr, nc), 0.0); });
+  transform(begin(x), begin(x) + nr, begin(res), [&](const double& v)        {
+    return accumulate(make_strided(&v, nr), make_strided(&v, nr, nc), 0.0);  });
   return res;
 }
 
@@ -326,10 +326,10 @@ NumericVector strided_row_sum2(const NumericMatrix& x)
   auto nr = x.nrow();
   NumericVector res(nr, 0.0);
   for_each(make_strided(begin(x), nr), make_strided(end(x)),
-           [&](const double& y){
+           [&](const double& y)                                {
              transform(&y, &y + nr, begin(res), begin(res),
-                       [](const double& a, const double& b){
-                         return a + b; });});
+                       [](const double& a, const double& b)    {
+                         return a + b;                         });});
   return res;
 }
 

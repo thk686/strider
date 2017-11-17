@@ -68,11 +68,11 @@
 <p>Adapting multidimensional legacy buffers to the C++ standard library is difficult owing to a lack of strided (address-skipping) iterators. <strong>Strider</strong> provides an address-skipping pointer adapter. It can be used to scan multidimensional data along any desired margin using the standard library algorithms.</p>
 <p>This code snippet computes row sums of a matrix.</p>
 <div class="sourceCode"><pre class="sourceCode cpp"><code class="sourceCode cpp">  for_each(make_strided(begin(x), nr), make_strided(end(x)),
-           [&amp;](<span class="at">const</span> <span class="dt">double</span>&amp; y){
+           [&amp;](<span class="at">const</span> <span class="dt">double</span>&amp; y)                                {
              transform(&amp;y, &amp;y + nr, begin(res), begin(res),
-                       [](<span class="at">const</span> <span class="dt">double</span>&amp; a, <span class="at">const</span> <span class="dt">double</span>&amp; b){
-                         <span class="cf">return</span> a + b; });});</code></pre></div>
-<p>It is cache and compiler friendly and runs nearly four times faster than R’s built-in <code>rowSums</code> function. See the vignette for details.</p>
+                       [](<span class="at">const</span> <span class="dt">double</span>&amp; a, <span class="at">const</span> <span class="dt">double</span>&amp; b)    {
+                         <span class="cf">return</span> a + b;                         });});</code></pre></div>
+<p>It is cache and compiler friendly and runs nearly four times faster than R’s built-in <code>rowSums</code> function. See <a href="https://thk686.github.io/strider/articles/strider.html">the vignette</a> for details.</p>
 <p>The header file is stand-alone and can be used separate from <a href="https://www.r-project.org">R</a>. It relies on the <a href="https://www.boost.org/doc/libs/release/libs/iterator/">Boost iterator library</a>.</p>
 <p><a href="https://cran.r-project.org/package=strider"><img src="http://www.r-pkg.org/badges/version/strider" alt="CRAN status"></a> <a href="https://travis-ci.org/thk686/strider"><img src="https://travis-ci.org/thk686/strider.svg?branch=master" alt="Travis build status"></a> <a href="https://ci.appveyor.com/project/thk686/strider"><img src="https://ci.appveyor.com/api/projects/status/github/thk686/strider?branch=master&amp;svg=true" alt="AppVeyor Build Status"></a> <a href="https://codecov.io/github/thk686/strider?branch=master"><img src="https://codecov.io/gh/thk686/strider/branch/master/graph/badge.svg" alt="Coverage status"></a> <a href="http://depsy.org/package/r/strider"><img src="http://depsy.org/api/package/cran/strider/badge.svg" alt="Depsy"></a></p>
 </div>

@@ -11,13 +11,13 @@ This code snippet computes row sums of a matrix.
 
 ``` cpp
   for_each(make_strided(begin(x), nr), make_strided(end(x)),
-           [&](const double& y){
+           [&](const double& y)                                {
              transform(&y, &y + nr, begin(res), begin(res),
-                       [](const double& a, const double& b){
-                         return a + b; });});
+                       [](const double& a, const double& b)    {
+                         return a + b;                         });});
 ```
 
-It is cache and compiler friendly and runs nearly four times faster than R's built-in `rowSums` function. See the vignette for details.
+It is cache and compiler friendly and runs nearly four times faster than R's built-in `rowSums` function. See [the vignette](https://thk686.github.io/strider/articles/strider.html) for details.
 
 The header file is stand-alone and can be used separate from [R](https://www.r-project.org). It relies on the [Boost iterator library](https://www.boost.org/doc/libs/release/libs/iterator/).
 
