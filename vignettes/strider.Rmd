@@ -429,7 +429,7 @@ range_loop_convolve2(const NumericMatrix& a,
 }
 ```
 
-As a quick test, I check whether the convolution is invariant to the delta function as required. It should be noted that these are not the fasted algorithms for performing convolution. A more efficient implementation would never compute the same product twice. For large matricies, Fourier methods are faster still. 
+As a quick test, I check whether the convolution is invariant to the delta function as required. 
 
 ```{r include=FALSE}
 local({
@@ -469,7 +469,7 @@ microbenchmark(convolve2_cpp(a, b),
   knitr::kable(digits = 1, caption = "Evaluations per second")
 ```
 
-The strided implementation appears to have a slight advantage, however these results may change on different systems. It is possible the index-offset calculations are making the indexed version slower. The importance of offset calculations should increase with the number of dimensions.
+The strided implementation appears to have a slight advantage, however these results may change on different systems. It is possible the index-offset calculations are making the indexed version slower. The importance of offset calculations should increase with the number of dimensions. It should be noted that these are not the fasted algorithms for performing convolution. If the kernel is separable, each dimension can be convolved individually. For large matrices, Fourier methods are faster still.
 
 ## Conclusions
 
