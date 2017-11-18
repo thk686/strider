@@ -91,15 +91,15 @@ convolve2(const NumericMatrix& a,
     nrab = nra + nrb - 1,
     ncab = nca + ncb - 1;
   NumericMatrix ab(nrab, ncab);
-  auto acc1 = make_strided(begin(ab), nrab);
+  auto iter1 = make_strided(begin(ab), nrab);
   for (auto&& t : make_strided_range(begin(a), nra, nca))    {
-    auto acc2 = make_strided(&*acc1++, nrab);
+    auto iter2 = make_strided(&*iter1++, nrab);
     for (auto&& u : make_strided_range(begin(b), nrb, ncb))  {
-      auto acc3 = &*acc2++;
+      auto iter3 = &*iter2++;
       for (auto&& v : make_strided_range(&t, 1, nra))        {
-        auto acc4 = acc3++;
+        auto iter4 = iter3++;
         for (auto&& w : make_strided_range(&u, 1, nrb))      {
-          *acc4++ += v * w;                                  }}}}
+          *iter4++ += v * w;                                  }}}}
   return ab;
 }
 
