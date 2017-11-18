@@ -28,10 +28,23 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// convolve2
+NumericMatrix convolve2(const NumericMatrix& a, const NumericMatrix& b);
+RcppExport SEXP _strider_convolve2(SEXP aSEXP, SEXP bSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const NumericMatrix& >::type a(aSEXP);
+    Rcpp::traits::input_parameter< const NumericMatrix& >::type b(bSEXP);
+    rcpp_result_gen = Rcpp::wrap(convolve2(a, b));
+    return rcpp_result_gen;
+END_RCPP
+}
 
 static const R_CallMethodDef CallEntries[] = {
     {"_strider_row_sums", (DL_FUNC) &_strider_row_sums, 1},
     {"_strider_col_sums", (DL_FUNC) &_strider_col_sums, 1},
+    {"_strider_convolve2", (DL_FUNC) &_strider_convolve2, 2},
     {NULL, NULL, 0}
 };
 

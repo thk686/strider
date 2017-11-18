@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>strider: Strided Pointer Iterator and Range — strider-package • strider</title>
+<title>strider: Strided Iterator and Range — strider-package • strider</title>
 
 <!-- jquery -->
 <script src="https://code.jquery.com/jquery-3.1.0.min.js" integrity="sha384-nrOSfDHtoPMzJHjVTdCopGqIqeYETSXhZDFyniQ8ZHcVy08QesyHcnOUpMpqnmWq" crossorigin="anonymous"></script>
@@ -83,18 +83,18 @@
       <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>strider: Strided Pointer Iterator and Range</h1>
+    <h1>strider: Strided Iterator and Range</h1>
     </div>
 
     
-    <p>The strided pointer adapts legacy buffers to the C++ standard library
-and range-based for-loops. Given a pointer into a multidimensional data buffer,
-one can generate an interator range using make_strided to construct strided
-versions of the standard library's begin and end. For constructing range-based
-for-loops, a strided_range class is provided. These help authors avoid
-integer-based indexing, which in some cases can impede algorithm performance
-and introduce indexing errors. This library exists primarily to expose the
-header file to other R projects.</p>
+    <p>The strided iterator adapts multidimensional buffers to work with
+the C++ standard library and range-based for-loops. Given a pointer or iterator
+into a multidimensional data buffer, one can generate an iterator range using
+make_strided to construct strided versions of the standard library's begin and
+end. For constructing range-based for-loops, a strided_range class is provided.
+These help authors avoid integer-based indexing, which in some cases can impede
+algorithm performance and introduce indexing errors. This library exists
+primarily to expose the header file to other R projects.</p>
     
 
         
@@ -113,6 +113,11 @@ header file to other R projects.</p>
       
       <li><a href="#see-also">See also</a></li>
           </ul>
+
+    <h2>Author</h2>
+    
+<strong>Maintainer</strong>: Tim Keitt
+
 
   </div>
 </div>

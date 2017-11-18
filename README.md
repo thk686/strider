@@ -1,7 +1,7 @@
 Strider
 ================
 Timothy H. Keitt
-2017-11-17
+2017-11-18
 
 "I don't think he knows about second breakfast" - Meriadoc 'Merry' Brandybuck
 

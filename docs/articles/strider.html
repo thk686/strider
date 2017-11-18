@@ -63,7 +63,7 @@
       <h1>The Strider Package</h1>
                         <h4 class="author">Timothy H. Keitt</h4>
             
-            <h4 class="date">2017-11-17</h4>
+            <h4 class="date">2017-11-18</h4>
           </div>
 
     
@@ -173,12 +173,12 @@ range_loop_convolve(<span class="at">const</span> NumericVector&amp; a,
 <tbody>
 <tr class="odd">
 <td align="left">stl_algo_convolve(a, b)</td>
-<td align="right">101.5</td>
+<td align="right">101.3</td>
 <td align="right">1</td>
 </tr>
 <tr class="even">
 <td align="left">range_loop_convolve(a, b)</td>
-<td align="right">101.5</td>
+<td align="right">101.1</td>
 <td align="right">1</td>
 </tr>
 <tr class="odd">
@@ -267,23 +267,23 @@ NumericVector range_col_sum(<span class="at">const</span> NumericMatrix&amp; x)
 <tbody>
 <tr class="odd">
 <td align="left">strided_col_sum(x)</td>
-<td align="right">1063.7</td>
-<td align="right">1.0</td>
+<td align="right">1064.5</td>
+<td align="right">1</td>
 </tr>
 <tr class="even">
 <td align="left">colSums(x)</td>
-<td align="right">1017.3</td>
-<td align="right">1.0</td>
+<td align="right">1044.7</td>
+<td align="right">1</td>
 </tr>
 <tr class="odd">
 <td align="left">range_col_sum(x)</td>
-<td align="right">992.7</td>
-<td align="right">0.9</td>
+<td align="right">1038.6</td>
+<td align="right">1</td>
 </tr>
 <tr class="even">
 <td align="left">indx_col_sum(x)</td>
-<td align="right">989.1</td>
-<td align="right">0.9</td>
+<td align="right">1038.6</td>
+<td align="right">1</td>
 </tr>
 </tbody>
 </table>
@@ -361,29 +361,29 @@ NumericVector range_row_sum(<span class="at">const</span> NumericMatrix&amp; x)
 </tr></thead>
 <tbody>
 <tr class="odd">
-<td align="left">strided_row_sum2(x)</td>
-<td align="right">1859.2</td>
+<td align="left">range_row_sum(x)</td>
+<td align="right">1865.3</td>
 <td align="right">1.0</td>
 </tr>
 <tr class="even">
-<td align="left">range_row_sum(x)</td>
-<td align="right">1842.1</td>
+<td align="left">indx_row_sum(x)</td>
+<td align="right">1864.1</td>
 <td align="right">1.0</td>
 </tr>
 <tr class="odd">
-<td align="left">indx_row_sum(x)</td>
-<td align="right">1824.5</td>
+<td align="left">strided_row_sum2(x)</td>
+<td align="right">1859.8</td>
 <td align="right">1.0</td>
 </tr>
 <tr class="even">
-<td align="left">rowSums(x)</td>
-<td align="right">481.1</td>
+<td align="left">strided_row_sum(x)</td>
+<td align="right">488.3</td>
 <td align="right">0.3</td>
 </tr>
 <tr class="odd">
-<td align="left">strided_row_sum(x)</td>
-<td align="right">406.1</td>
-<td align="right">0.2</td>
+<td align="left">rowSums(x)</td>
+<td align="right">482.0</td>
+<td align="right">0.3</td>
 </tr>
 </tbody>
 </table>
@@ -437,7 +437,7 @@ range_loop_convolve2(<span class="at">const</span> NumericMatrix&amp; a,
           *acc4++ += v * w;                                  }}}}
   <span class="cf">return</span> ab;
 }</code></pre></div>
-<p>As a quick test, I check whether the convolution is invariant to the delta function as required. It should be noted that these are not the fasted algorithms for performing convolution. A more efficient implementation would never compute the same product twice. For large matricies, Fourier methods are faster still.</p>
+<p>As a quick test, I check whether the convolution is invariant to the delta function as required.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">a =<span class="st"> </span><span class="kw">matrix</span>(<span class="kw">c</span>(<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>,
              <span class="dv">4</span>, <span class="dv">5</span>, <span class="dv">6</span>), <span class="dv">2</span>, <span class="dv">3</span>, <span class="dt">byrow =</span> <span class="ot">TRUE</span>)
 b =<span class="st"> </span><span class="kw">matrix</span>(<span class="kw">c</span>(<span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">0</span>,
@@ -469,17 +469,17 @@ b =<span class="st"> </span><span class="kw">matrix</span>(<span class="kw">c</s
 <tbody>
 <tr class="odd">
 <td align="left">range_loop_convolve2(a, b)</td>
-<td align="right">377.0</td>
+<td align="right">395.0</td>
 <td align="right">1.0</td>
 </tr>
 <tr class="even">
 <td align="left">convolve2_cpp(a, b)</td>
-<td align="right">300.6</td>
+<td align="right">331.6</td>
 <td align="right">0.8</td>
 </tr>
 </tbody>
 </table>
-<p>The strided implementation appears to have a slight advantage, however these results may change on different systems. It is possible the index-offset calculations are making the indexed version slower. The importance of offset calculations should increase with the number of dimensions.</p>
+<p>The strided implementation appears to have a slight advantage, however these results may change on different systems. It is possible the index-offset calculations are making the indexed version slower. The importance of offset calculations should increase with the number of dimensions. It should be noted that these are not the fasted algorithms for performing convolution. If the kernel is separable, each dimension can be convolved individually. For large matrices, Fourier methods are faster still.</p>
 </div>
 </div>
 <div id="conclusions" class="section level2">

@@ -26,3 +26,6 @@ row_sums(matrix(1:9, 3))
 col_sums(matrix(1:9, 3))
 
 }
+\seealso{
+\code{\link{rowSums}}, \code{\link{colSums}}
+}

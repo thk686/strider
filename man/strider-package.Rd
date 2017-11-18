@@ -4,16 +4,16 @@
 \name{strider-package}
 \alias{strider}
 \alias{strider-package}
-\title{strider: Strided Pointer Iterator and Range}
+\title{strider: Strided Iterator and Range}
 \description{
-The strided pointer adapts legacy buffers to the C++ standard library
-and range-based for-loops. Given a pointer into a multidimensional data buffer,
-one can generate an interator range using make_strided to construct strided
-versions of the standard library's begin and end. For constructing range-based
-for-loops, a strided_range class is provided. These help authors avoid
-integer-based indexing, which in some cases can impede algorithm performance
-and introduce indexing errors. This library exists primarily to expose the
-header file to other R projects.
+The strided iterator adapts multidimensional buffers to work with
+the C++ standard library and range-based for-loops. Given a pointer or iterator
+into a multidimensional data buffer, one can generate an iterator range using
+make_strided to construct strided versions of the standard library's begin and
+end. For constructing range-based for-loops, a strided_range class is provided.
+These help authors avoid integer-based indexing, which in some cases can impede
+algorithm performance and introduce indexing errors. This library exists
+primarily to expose the header file to other R projects.
 }
 \seealso{
 Useful links:
@@ -21,6 +21,10 @@ Useful links:
   \item \url{https://github.com/thk686/strider}
   \item Report bugs at \url{https://github.com/thk686/strider/issues}
 }
+
+}
+\author{
+\strong{Maintainer}: Tim Keitt
 
 }
 \keyword{internal}
