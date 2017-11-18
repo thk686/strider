@@ -24,7 +24,7 @@ Useful links:
 
 }
 \author{
-\strong{Maintainer}: Tim Keitt
+\strong{Maintainer}: Tim Keitt \email{tkeitt@gmail.com}
 
 }
 \keyword{internal}
