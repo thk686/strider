@@ -173,17 +173,17 @@ range_loop_convolve(<span class="at">const</span> NumericVector&amp; a,
 <tbody>
 <tr class="odd">
 <td align="left">stl_algo_convolve(a, b)</td>
-<td align="right">101.3</td>
+<td align="right">100.8</td>
 <td align="right">1</td>
 </tr>
 <tr class="even">
 <td align="left">range_loop_convolve(a, b)</td>
-<td align="right">101.1</td>
+<td align="right">100.7</td>
 <td align="right">1</td>
 </tr>
 <tr class="odd">
 <td align="left">convolve_cpp(a, b)</td>
-<td align="right">100.7</td>
+<td align="right">100.3</td>
 <td align="right">1</td>
 </tr>
 </tbody>
@@ -267,22 +267,22 @@ NumericVector range_col_sum(<span class="at">const</span> NumericMatrix&amp; x)
 <tbody>
 <tr class="odd">
 <td align="left">strided_col_sum(x)</td>
-<td align="right">1064.5</td>
+<td align="right">1049.9</td>
 <td align="right">1</td>
 </tr>
 <tr class="even">
 <td align="left">colSums(x)</td>
-<td align="right">1044.7</td>
+<td align="right">1039.7</td>
 <td align="right">1</td>
 </tr>
 <tr class="odd">
-<td align="left">range_col_sum(x)</td>
-<td align="right">1038.6</td>
+<td align="left">indx_col_sum(x)</td>
+<td align="right">1031.4</td>
 <td align="right">1</td>
 </tr>
 <tr class="even">
-<td align="left">indx_col_sum(x)</td>
-<td align="right">1038.6</td>
+<td align="left">range_col_sum(x)</td>
+<td align="right">1029.5</td>
 <td align="right">1</td>
 </tr>
 </tbody>
@@ -361,29 +361,29 @@ NumericVector range_row_sum(<span class="at">const</span> NumericMatrix&amp; x)
 </tr></thead>
 <tbody>
 <tr class="odd">
-<td align="left">range_row_sum(x)</td>
-<td align="right">1865.3</td>
+<td align="left">indx_row_sum(x)</td>
+<td align="right">1951.5</td>
 <td align="right">1.0</td>
 </tr>
 <tr class="even">
-<td align="left">indx_row_sum(x)</td>
-<td align="right">1864.1</td>
+<td align="left">range_row_sum(x)</td>
+<td align="right">1922.2</td>
 <td align="right">1.0</td>
 </tr>
 <tr class="odd">
 <td align="left">strided_row_sum2(x)</td>
-<td align="right">1859.8</td>
+<td align="right">1921.2</td>
 <td align="right">1.0</td>
 </tr>
 <tr class="even">
 <td align="left">strided_row_sum(x)</td>
-<td align="right">488.3</td>
+<td align="right">544.2</td>
 <td align="right">0.3</td>
 </tr>
 <tr class="odd">
 <td align="left">rowSums(x)</td>
-<td align="right">482.0</td>
-<td align="right">0.3</td>
+<td align="right">479.1</td>
+<td align="right">0.2</td>
 </tr>
 </tbody>
 </table>
@@ -426,15 +426,15 @@ range_loop_convolve2(<span class="at">const</span> NumericMatrix&amp; a,
     nrab = nra + nrb - <span class="dv">1</span>,
     ncab = nca + ncb - <span class="dv">1</span>;
   NumericMatrix ab(nrab, ncab);
-  <span class="kw">auto</span> acc1 = make_strided(begin(ab), nrab);
+  <span class="kw">auto</span> iter1 = make_strided(begin(ab), nrab);
   <span class="cf">for</span> (<span class="kw">auto</span>&amp;&amp; t : make_strided_range(begin(a), nra, nca))    {
-    <span class="kw">auto</span> acc2 = make_strided(&amp;*acc1++, nrab);
+    <span class="kw">auto</span> iter2 = make_strided(&amp;*iter1++, nrab);
     <span class="cf">for</span> (<span class="kw">auto</span>&amp;&amp; u : make_strided_range(begin(b), nrb, ncb))  {
-      <span class="kw">auto</span> acc3 = &amp;*acc2++;
+      <span class="kw">auto</span> iter3 = &amp;*iter2++;
       <span class="cf">for</span> (<span class="kw">auto</span>&amp;&amp; v : make_strided_range(&amp;t, <span class="dv">1</span>, nra))        {
-        <span class="kw">auto</span> acc4 = acc3++;
+        <span class="kw">auto</span> iter4 = iter3++;
         <span class="cf">for</span> (<span class="kw">auto</span>&amp;&amp; w : make_strided_range(&amp;u, <span class="dv">1</span>, nrb))      {
-          *acc4++ += v * w;                                  }}}}
+          *iter4++ += v * w;                                  }}}}
   <span class="cf">return</span> ab;
 }</code></pre></div>
 <p>As a quick test, I check whether the convolution is invariant to the delta function as required.</p>
@@ -469,12 +469,12 @@ b =<span class="st"> </span><span class="kw">matrix</span>(<span class="kw">c</s
 <tbody>
 <tr class="odd">
 <td align="left">range_loop_convolve2(a, b)</td>
-<td align="right">395.0</td>
+<td align="right">396.5</td>
 <td align="right">1.0</td>
 </tr>
 <tr class="even">
 <td align="left">convolve2_cpp(a, b)</td>
-<td align="right">331.6</td>
+<td align="right">331.3</td>
 <td align="right">0.8</td>
 </tr>
 </tbody>
