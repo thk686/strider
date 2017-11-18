@@ -16,6 +16,7 @@
 #' row_sums(matrix(1:9, 3))
 #' col_sums(matrix(1:9, 3))
 #' 
+#' @seealso \code{\link{rowSums}}, \code{\link{colSums}}
 #' @rdname sums
 #' @export
 row_sums <- function(x) {
@@ -26,5 +27,32 @@ row_sums <- function(x) {
 #' @export
 col_sums <- function(x) {
     .Call(`_strider_col_sums`, x)
+}
+
+#' Convolve Matrices
+#' 
+#' Demonstration of fast matrix convolution C++
+#' 
+#' @param a a numeric matrix
+#' @param b a numeric matrix
+#' 
+#' @details A very efficient matric convolution implementation that demonstrates
+#' the use of the strided pointer and strided range concepts. Performance will be
+#' improved if the smaller matrix is given as the second argument.
+#'
+#' @examples
+#' a = matrix(c(1, 2, 1,
+#'              1, 1, 1), 2, 3, byrow = TRUE)
+#' b = matrix(c(0, 0, 0,
+#'              0, 0, 0,
+#'              0, 1, 0,
+#'              0, 0, 0), 4, 3, byrow = TRUE)
+#' convolve2(a, b)
+#' 
+#' @seealso \code{\link{convolve}}
+#' @rdname convolve
+#' @export
+convolve2 <- function(a, b) {
+    .Call(`_strider_convolve2`, a, b)
 }
 
