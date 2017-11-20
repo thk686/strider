@@ -59,7 +59,7 @@ The difficulty applying the standard library algorithms to multidimensional data
 
 ### Replacing index loops with standard library algorithms
 
-As a prelude to using the **strided_iterator** class, I start out with an example of vector convolution because it is one of the original examples in the [Rcpp](https://github.com/RcppCore/Rcpp) documentation, which I have copied verbatim here. I have place some definitions into a header file whose contents can be found in the RMarkdown source file used to generate this output. Otherwise, all compiler settings were left at their default values.
+As a prelude to using the **strided_iterator** class, I start out with an example of vector convolution because it is one of the original examples in the [Rcpp](https://github.com/RcppCore/Rcpp) documentation, which I have copied verbatim here. I have placed some definitions into a header file whose contents can be found in the RMarkdown source file used to generate this output. Otherwise, all compiler settings were left at their default values.
 
 ```{Rcpp}
 // [[Rcpp::depends(BH)]]
