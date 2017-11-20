@@ -11,7 +11,7 @@ the C++ standard library and range-based for-loops. Given a pointer or iterator
 into a multidimensional data buffer, one can generate an iterator range using
 make_strided to construct strided versions of the standard library's begin and
 end. For constructing range-based for-loops, a strided_range class is provided.
-These help authors avoid integer-based indexing, which in some cases can impede
+These help authors to avoid integer-based indexing, which in some cases can impede
 algorithm performance and introduce indexing errors. This library exists
 primarily to expose the header file to other R projects.
 }
