@@ -63,7 +63,7 @@
       <h1>The Strider Package</h1>
                         <h4 class="author">Timothy H. Keitt</h4>
             
-            <h4 class="date">2017-11-18</h4>
+            <h4 class="date">2017-11-21</h4>
           </div>
 
     
@@ -78,7 +78,7 @@
 <div id="replacing-index-loops-with-standard-library-algorithms" class="section level3">
 <h3 class="hasAnchor">
 <a href="#replacing-index-loops-with-standard-library-algorithms" class="anchor"></a>Replacing index loops with standard library algorithms</h3>
-<p>As a prelude to using the <strong>strided_iterator</strong> class, I start out with an example of vector convolution because it is one of the original examples in the <a href="https://github.com/RcppCore/Rcpp">Rcpp</a> documentation, which I have copied verbatim here. I have place some definitions into a header file whose contents can be found in the RMarkdown source file used to generate this output. Otherwise, all compiler settings were left at their default values.</p>
+<p>As a prelude to using the <strong>strided_iterator</strong> class, I start out with an example of vector convolution because it is one of the original examples in the <a href="https://github.com/RcppCore/Rcpp">Rcpp</a> documentation, which I have copied verbatim here. I have placed some definitions into a header file whose contents can be found in the RMarkdown source file used to generate this output. Otherwise, all compiler settings were left at their default values.</p>
 <div class="sourceCode"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span class="co">// [[Rcpp::depends(BH)]]</span>
 <span class="co">// [[Rcpp::depends(strider)]]</span>
 <span class="co">// [[Rcpp::plugins(cpp11)]]</span>
@@ -173,17 +173,17 @@ range_loop_convolve(<span class="at">const</span> NumericVector&amp; a,
 <tbody>
 <tr class="odd">
 <td align="left">stl_algo_convolve(a, b)</td>
-<td align="right">100.8</td>
+<td align="right">61.1</td>
 <td align="right">1</td>
 </tr>
 <tr class="even">
 <td align="left">range_loop_convolve(a, b)</td>
-<td align="right">100.7</td>
+<td align="right">61.1</td>
 <td align="right">1</td>
 </tr>
 <tr class="odd">
 <td align="left">convolve_cpp(a, b)</td>
-<td align="right">100.3</td>
+<td align="right">61.0</td>
 <td align="right">1</td>
 </tr>
 </tbody>
@@ -267,22 +267,22 @@ NumericVector range_col_sum(<span class="at">const</span> NumericMatrix&amp; x)
 <tbody>
 <tr class="odd">
 <td align="left">strided_col_sum(x)</td>
-<td align="right">1049.9</td>
+<td align="right">1022.5</td>
 <td align="right">1</td>
 </tr>
 <tr class="even">
 <td align="left">colSums(x)</td>
-<td align="right">1039.7</td>
+<td align="right">998.1</td>
 <td align="right">1</td>
 </tr>
 <tr class="odd">
-<td align="left">indx_col_sum(x)</td>
-<td align="right">1031.4</td>
+<td align="left">range_col_sum(x)</td>
+<td align="right">992.0</td>
 <td align="right">1</td>
 </tr>
 <tr class="even">
-<td align="left">range_col_sum(x)</td>
-<td align="right">1029.5</td>
+<td align="left">indx_col_sum(x)</td>
+<td align="right">985.4</td>
 <td align="right">1</td>
 </tr>
 </tbody>
@@ -328,11 +328,8 @@ NumericVector strided_row_sum2(<span class="at">const</span> NumericMatrix&amp; 
 {
   <span class="kw">auto</span> nr = x.nrow();
   NumericVector res(nr, <span class="fl">0.0</span>);
-  for_each(make_strided(begin(x), nr), make_strided(end(x)),
-           [&amp;](<span class="at">const</span> <span class="dt">double</span>&amp; y)                                {
-             transform(&amp;y, &amp;y + nr, begin(res), begin(res),
-                       [](<span class="at">const</span> <span class="dt">double</span>&amp; a, <span class="at">const</span> <span class="dt">double</span>&amp; b)    {
-                         <span class="cf">return</span> a + b;                         });});
+  for_each(make_strided(begin(x), nr), make_strided(end(x)), [&amp;](<span class="at">const</span> <span class="dt">double</span>&amp; y) {
+    transform(&amp;y, &amp;y + nr, begin(res), begin(res), plus&lt;<span class="dt">double</span>&gt;());               });
   <span class="cf">return</span> res;
 }
 
@@ -362,28 +359,28 @@ NumericVector range_row_sum(<span class="at">const</span> NumericMatrix&amp; x)
 <tbody>
 <tr class="odd">
 <td align="left">indx_row_sum(x)</td>
-<td align="right">1951.5</td>
+<td align="right">1634.1</td>
 <td align="right">1.0</td>
 </tr>
 <tr class="even">
 <td align="left">range_row_sum(x)</td>
-<td align="right">1922.2</td>
+<td align="right">1587.5</td>
 <td align="right">1.0</td>
 </tr>
 <tr class="odd">
 <td align="left">strided_row_sum2(x)</td>
-<td align="right">1921.2</td>
+<td align="right">1585.1</td>
 <td align="right">1.0</td>
 </tr>
 <tr class="even">
-<td align="left">strided_row_sum(x)</td>
-<td align="right">544.2</td>
+<td align="left">rowSums(x)</td>
+<td align="right">479.6</td>
 <td align="right">0.3</td>
 </tr>
 <tr class="odd">
-<td align="left">rowSums(x)</td>
-<td align="right">479.1</td>
-<td align="right">0.2</td>
+<td align="left">strided_row_sum(x)</td>
+<td align="right">123.0</td>
+<td align="right">0.1</td>
 </tr>
 </tbody>
 </table>
@@ -469,12 +466,12 @@ b =<span class="st"> </span><span class="kw">matrix</span>(<span class="kw">c</s
 <tbody>
 <tr class="odd">
 <td align="left">range_loop_convolve2(a, b)</td>
-<td align="right">396.5</td>
+<td align="right">265.1</td>
 <td align="right">1.0</td>
 </tr>
 <tr class="even">
 <td align="left">convolve2_cpp(a, b)</td>
-<td align="right">331.3</td>
+<td align="right">218.9</td>
 <td align="right">0.8</td>
 </tr>
 </tbody>

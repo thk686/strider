@@ -8,6 +8,7 @@ using std::for_each;
 using std::transform;
 using std::accumulate;
 using std::begin;
+using std::plus;
 using std::end;
 #include <strider.h>
 using strider::make_strided;
@@ -36,12 +37,8 @@ NumericVector row_sums(const NumericMatrix& x)
 {
   auto nr = x.nrow();
   NumericVector res(nr, 0.0);
-  for_each(make_strided(begin(x), nr),
-           make_strided(end(x), nr),
-           [&](const double& x){
-             transform(&x, &x + nr, begin(res), begin(res),
-                       [](const double& a, const double& b){
-                         return a + b; });});
+  for_each(make_strided(begin(x), nr), make_strided(end(x)), [&](const double& y) {
+    transform(&y, &y + nr, begin(res), begin(res), plus<double>());               });
   return res;
 }
 
