@@ -1,7 +1,7 @@
 Strider
 ================
 Timothy H. Keitt
-2017-11-18
+2017-11-21
 
 "I don't think he knows about second breakfast" - Meriadoc 'Merry' Brandybuck
 
@@ -10,11 +10,8 @@ Adapting multidimensional legacy buffers to the C++ standard library is difficul
 This code snippet computes row sums of a matrix.
 
 ``` cpp
-  for_each(make_strided(begin(x), nr), make_strided(end(x)),
-           [&](const double& y)                                {
-             transform(&y, &y + nr, begin(res), begin(res),
-                       [](const double& a, const double& b)    {
-                         return a + b;                         });});
+  for_each(make_strided(begin(x), nr), make_strided(end(x)), [&](const double& y) {
+    transform(&y, &y + nr, begin(res), begin(res), plus<double>());               });
 ```
 
 It is cache and compiler friendly and runs nearly four times faster than R's built-in `rowSums` function. See [the vignette](https://thk686.github.io/strider/articles/strider.html) for details.
