@@ -123,26 +123,6 @@ make_strided_range(T iter,
   return strided_range<T>(iter, stride, strides);
 }
 
-using std::multiplies;
-
-template<typename T, typename U>
-void recursive_transform(T iter,
-                         U dims_begin, U dims_end)
-{
-  auto next_dim = next(dims_begin);
-  if (next_dim == dims_end)
-  {
-    
-  }
-  else
-  {
-    using d_t = typename iterator_traits<T>::difference_type;
-    d_t stride = accumulate(next_dim, dims_end, d_t(1), multiplies<d_t>());
-    for (auto&& x : make_strided_range(iter, stride, *dims_begin))
-      recursive_transform(&x, next_dim, dims_end);
-  }
-}
-
 }; // namespace detail
 
 using detail::make_strided;
