@@ -9,3 +9,5 @@
 
 * Changes to vignette
 * Incremented version to 1.1
+* Added conditional usage of Suggests packages
+
