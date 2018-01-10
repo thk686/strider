@@ -11,7 +11,7 @@ vignette: >
 
 "I don't think he knows about second breakfast" - Meriadoc 'Merry' Brandybuck
 
-```{r include=FALSE, message=FALSE, warning=FALSE}
+```{r include=FALSE}
 header_code = '
 #include <Rcpp.h>
 using Rcpp::stop;
@@ -166,7 +166,7 @@ if (!identical(convolve_cpp(a, b), range_loop_convolve(a, b)))
 
 The main difference here is we have to manually increment the output iterator. That could be solved using a zip iterator adapter. (Convenient tuple syntax for this case is available in C++17.) Nonetheless, this example demonstrates how expressive range-based for-loops can be while avoiding explicit indices.
 
-There is no particular performance advantage to avoiding indices, so the choice is largely a matter of taste. Modern compilers will produce similar if not the exact same instructions regardless of the type of loop. Benchmarking comparisons can however point out problems with a particular implementation. It is useful to recall that benchmark differences within $\pm 10\%$ are likely meaningless and results will vary in different environments. Relative numbers below are therefore printed using ```digits = 1``` to demphasize small differences. With two vectors of length $10^4$, I get the following run times for the different loop implementations.
+There is no particular performance advantage to avoiding indices, so the choice is largely a matter of taste. Modern compilers will produce similar if not the exact same instructions regardless of the type of loop. Benchmarking comparisons can however point out problems with a particular implementation. It is useful to recall that benchmark differences within $\pm 10\%$ are likely meaningless and results will vary in different environments. Relative numbers below are therefore printed using ```digits = 1``` to demphasize small differences. With two vectors of length $10^4$, I get the following performances for the different loop implementations.
 
 ```{r echo=FALSE, warning=FALSE, message=FALSE}
 if (require(microbenchmark) && require(dplyr))
@@ -495,7 +495,7 @@ stl_algo_convolve2(a, b)
 
 The output is correct. Here are benchmark results for $50\times50$ random matrices.
 
-```{r echo=FALSE, messages=FALSE, warnings=FALSE}
+```{r echo=FALSE, message=FALSE, warning=FALSE}
 if (require(microbenchmark) && require(dplyr))
 {
   a = matrix(rnorm(2500), 50)
