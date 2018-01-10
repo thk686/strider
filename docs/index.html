@@ -68,7 +68,7 @@
 <p>Adapting multidimensional legacy buffers to the C++ standard library is difficult owing to a lack of strided (address-skipping) iterators. <strong>Strider</strong> provides an address-skipping pointer adapter. It can be used to scan multidimensional data along any desired margin using the standard library algorithms.</p>
 <p>This code snippet computes row sums of a matrix.</p>
 <div class="sourceCode"><pre class="sourceCode cpp"><code class="sourceCode cpp">  for_each(make_strided(begin(x), nr), make_strided(end(x)), [&amp;](<span class="at">const</span> <span class="dt">double</span>&amp; y) {
-    transform(&amp;y, &amp;y + nr, begin(res), begin(res), plus&lt;<span class="dt">double</span>&gt;());               });</code></pre></div>
+    transform(&amp;y, &amp;y + nr, begin(res), begin(res), plus&lt;<span class="dt">double</span>&gt;()); });</code></pre></div>
 <p>It is cache and compiler friendly and runs nearly four times faster than R’s built-in <code>rowSums</code> function. See <a href="https://thk686.github.io/strider/articles/strider.html">the vignette</a> for details.</p>
 <p>The header file is stand-alone and can be used separate from <a href="https://www.r-project.org">R</a>. It relies on the <a href="https://www.boost.org/doc/libs/release/libs/iterator/">Boost iterator library</a>.</p>
 <div id="installation" class="section level4">

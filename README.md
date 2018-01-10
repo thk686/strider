@@ -1,7 +1,7 @@
 Strider
 ================
 Timothy H. Keitt
-2017-11-24
+2018-01-10
 
 "I don't think he knows about second breakfast" - Meriadoc 'Merry' Brandybuck
 
@@ -11,7 +11,7 @@ This code snippet computes row sums of a matrix.
 
 ``` cpp
   for_each(make_strided(begin(x), nr), make_strided(end(x)), [&](const double& y) {
-    transform(&y, &y + nr, begin(res), begin(res), plus<double>());               });
+    transform(&y, &y + nr, begin(res), begin(res), plus<double>()); });
 ```
 
 It is cache and compiler friendly and runs nearly four times faster than R's built-in `rowSums` function. See [the vignette](https://thk686.github.io/strider/articles/strider.html) for details.

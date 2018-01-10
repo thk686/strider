@@ -63,7 +63,7 @@
       <h1>The Strider Package</h1>
                         <h4 class="author">Timothy H. Keitt</h4>
             
-            <h4 class="date">2017-11-24</h4>
+            <h4 class="date">2018-01-10</h4>
           </div>
 
     
@@ -73,8 +73,8 @@
 <div id="introduction" class="section level2">
 <h2 class="hasAnchor">
 <a href="#introduction" class="anchor"></a>Introduction</h2>
-<p>The <a href="http://en.cppreference.com/w/">C++ standard library</a> introduced generic algorithms that operate on a sequences defined by begin-end iterator-pairs. These generic algorithms can be used to replace C-style for-loops over indices. They are thought to reduce common code bugs resulting from off-by-n indexing errors that can result in buffer overruns and other illogical behavior. Applying the standard library algorithms is often straightforward for simple sequences bounded by iterators. When working with multidimensional data like matrices however, many authors revert to computing indices, either because it is more explicit and therefor easier to implement or because the multidimensional data structures do not offer pre-defined iterators.</p>
-<p>The difficulty applying the standard library algorithms to multidimensional data stems from the fact that successive dimensions must follow leading dimensions and this necessitates skips when iterating. Solving this requires a strided iterator that skips over intermediate memory locations when incrementing or decrementing. Having myself often reverted to indices when implementing algorithms on multidimensional data, while simultaneously wishing for more consistency with the standard library, I decided to implement a strided pointer class and wrap it in the new R library <strong>strider</strong>. The header is installed with the package, so it can be used by other packages via the LinkingTo directive in the DESCRIPTION file. The header has no dependencies on R and so can be used separately.</p>
+<p>The <a href="http://en.cppreference.com/w/">C++ standard library</a> introduced generic algorithms that operate on a sequences defined by begin-end iterator-pairs. These generic algorithms can be used to replace C-style for-loops over indices. They are thought to reduce common code bugs resulting from off-by-n indexing errors that can result in buffer overruns and other illogical behavior. Some have even suggested <a href="https://channel9.msdn.com/Events/GoingNative/2013/Cpp-Seasoning">“no raw loops”</a> as a rule. Applying the standard library algorithms is often straightforward for simple sequences bounded by iterators. When working with multidimensional data like matrices however, many authors revert to computing indices, either because it is more explicit and therefor easier to implement or because the multidimensional data structures do not offer pre-defined iterators.</p>
+<p>The difficulty applying the standard library algorithms to multidimensional data stems from the fact that successive dimensions must follow leading dimensions and this necessitates skips when iterating. Solving this requires a strided iterator that skips over intermediate memory locations when incrementing or decrementing. Having myself often reverted to indices when implementing algorithms on multidimensional data, while simultaneously wishing for more consistency with the standard library, I decided to implement a strided pointer class and wrap it in the new R library <strong>strider</strong>. The header is installed with the package, so it can be used by other packages via the LinkingTo directive in the DESCRIPTION file. <strong>The header has no dependencies on R and so can be used separately.</strong></p>
 <div id="replacing-index-loops-with-standard-library-algorithms" class="section level3">
 <h3 class="hasAnchor">
 <a href="#replacing-index-loops-with-standard-library-algorithms" class="anchor"></a>Replacing index loops with standard library algorithms</h3>
@@ -124,9 +124,9 @@ stl_algo_convolve(<span class="at">const</span> NumericVector&amp; a,
   <span class="co">// Crux of the algorithm</span>
   transform(begin(a), end(a),
             begin(ab), begin(ab),
-            [&amp;b](<span class="at">const</span> <span class="dt">double</span> t, <span class="dt">double</span>&amp; u){
+            [&amp;b](<span class="at">const</span> <span class="dt">double</span> t, <span class="dt">double</span>&amp; u) {
               transform(begin(b), end(b), &amp;u, &amp;u,
-                        [t](<span class="at">const</span> <span class="dt">double</span> v, <span class="at">const</span> <span class="dt">double</span> w){
+                        [t](<span class="at">const</span> <span class="dt">double</span> v, <span class="at">const</span> <span class="dt">double</span> w) {
                           <span class="cf">return</span> w + t * v; });
               <span class="cf">return</span> u; });
   <span class="co">// Return result</span>
@@ -172,18 +172,18 @@ range_loop_convolve(<span class="at">const</span> NumericVector&amp; a,
 </tr></thead>
 <tbody>
 <tr class="odd">
-<td align="left">stl_algo_convolve(a, b)</td>
-<td align="right">99.6</td>
+<td align="left">range_loop_convolve(a, b)</td>
+<td align="right">102.1</td>
 <td align="right">1</td>
 </tr>
 <tr class="even">
-<td align="left">range_loop_convolve(a, b)</td>
-<td align="right">99.5</td>
+<td align="left">stl_algo_convolve(a, b)</td>
+<td align="right">102.0</td>
 <td align="right">1</td>
 </tr>
 <tr class="odd">
 <td align="left">convolve_cpp(a, b)</td>
-<td align="right">98.0</td>
+<td align="right">100.1</td>
 <td align="right">1</td>
 </tr>
 </tbody>
@@ -232,16 +232,6 @@ NumericVector indx_col_sum(<span class="at">const</span> NumericMatrix&amp; x)
 }
 
 <span class="co">// [[Rcpp::export]]</span>
-NumericVector strided_col_sum(<span class="at">const</span> NumericMatrix&amp; x)
-{
-  <span class="kw">auto</span> nr = x.nrow();
-  NumericVector res(x.ncol());
-  transform(make_strided(begin(x), nr), make_strided(end(x)), begin(res),
-            [nr](<span class="at">const</span> <span class="dt">double</span>&amp; v){ <span class="cf">return</span> accumulate(&amp;v, &amp;v + nr, <span class="fl">0.0</span>); });
-  <span class="cf">return</span> res;
-}
-
-<span class="co">// [[Rcpp::export]]</span>
 NumericVector range_col_sum(<span class="at">const</span> NumericMatrix&amp; x)
 {
   <span class="kw">auto</span>
@@ -255,6 +245,16 @@ NumericVector range_col_sum(<span class="at">const</span> NumericMatrix&amp; x)
     ++t;
   }
   <span class="cf">return</span> res;
+}
+
+<span class="co">// [[Rcpp::export]]</span>
+NumericVector strided_col_sum(<span class="at">const</span> NumericMatrix&amp; x)
+{
+  <span class="kw">auto</span> nr = x.nrow();
+  NumericVector res(x.ncol());
+  transform(make_strided(begin(x), nr), make_strided(end(x)), begin(res),
+            [nr](<span class="at">const</span> <span class="dt">double</span>&amp; v){ <span class="cf">return</span> accumulate(&amp;v, &amp;v + nr, <span class="fl">0.0</span>); });
+  <span class="cf">return</span> res;
 }</code></pre></div>
 <p>In this case, owing to the column-major memory layout of R matrices, the STL <code>transform</code> algorithm combined with <code>make_strided</code> is the most compact in terms of code. Furthermore, the strided iterator is incremented in the outer loop meaning the scanning of the matrix is in the optimal order. The performance of these three implementations are equivalent, as is R’s built in <code>colSumms</code> implemented in C.</p>
 <table class="table">
@@ -267,22 +267,22 @@ NumericVector range_col_sum(<span class="at">const</span> NumericMatrix&amp; x)
 <tbody>
 <tr class="odd">
 <td align="left">strided_col_sum(x)</td>
-<td align="right">1027.8</td>
+<td align="right">1050.0</td>
 <td align="right">1</td>
 </tr>
 <tr class="even">
 <td align="left">colSums(x)</td>
-<td align="right">1014.6</td>
+<td align="right">1033.6</td>
 <td align="right">1</td>
 </tr>
 <tr class="odd">
-<td align="left">range_col_sum(x)</td>
-<td align="right">1010.1</td>
+<td align="left">indx_col_sum(x)</td>
+<td align="right">1025.7</td>
 <td align="right">1</td>
 </tr>
 <tr class="even">
-<td align="left">indx_col_sum(x)</td>
-<td align="right">993.3</td>
+<td align="left">range_col_sum(x)</td>
+<td align="right">1019.7</td>
 <td align="right">1</td>
 </tr>
 </tbody>
@@ -312,29 +312,6 @@ NumericVector indx_row_sum(<span class="at">const</span> NumericMatrix&amp; x)
 }
 
 <span class="co">// [[Rcpp::export]]</span>
-NumericVector strided_row_sum(<span class="at">const</span> NumericMatrix&amp; x)
-{
-  <span class="kw">auto</span>
-    nr = x.nrow(),
-    nc = x.ncol();
-  NumericVector res(nr);
-  transform(begin(x), begin(x) + nr, begin(res), [nr, nc](<span class="at">const</span> <span class="dt">double</span>&amp; v)   {
-    <span class="cf">return</span> accumulate(make_strided(&amp;v, nr), make_strided(&amp;v, nr, nc), <span class="fl">0.0</span>);  });
-  <span class="cf">return</span> res;
-}
-
-<span class="co">// [[Rcpp::export]]</span>
-NumericVector strided_row_sum2(<span class="at">const</span> NumericMatrix&amp; x)
-{
-  <span class="kw">auto</span> nr = x.nrow();
-  NumericVector res(nr, <span class="fl">0.0</span>);
-  for_each(make_strided(begin(x), nr),
-           make_strided(end(x)), [&amp;res, nr](<span class="at">const</span> <span class="dt">double</span>&amp; y)         {
-    transform(&amp;y, &amp;y + nr, begin(res), begin(res), plus&lt;<span class="dt">double</span>&gt;());  });
-  <span class="cf">return</span> res;
-}
-
-<span class="co">// [[Rcpp::export]]</span>
 NumericVector range_row_sum(<span class="at">const</span> NumericMatrix&amp; x)
 {
   <span class="kw">auto</span>
@@ -346,6 +323,28 @@ NumericVector range_row_sum(<span class="at">const</span> NumericMatrix&amp; x)
     <span class="kw">auto</span> t = begin(res);
     <span class="cf">for</span> (<span class="kw">auto</span> v = &amp;u; v != &amp;u + nr; ++v) *t++ += *v;
   }
+  <span class="cf">return</span> res;
+}
+
+<span class="co">// [[Rcpp::export]]</span>
+NumericVector strided_row_sum(<span class="at">const</span> NumericMatrix&amp; x)
+{
+  <span class="kw">auto</span>
+    nr = x.nrow(),
+    nc = x.ncol();
+  NumericVector res(nr);
+  transform(begin(x), begin(x) + nr, begin(res), [nr, nc](<span class="at">const</span> <span class="dt">double</span>&amp; v) {
+    <span class="cf">return</span> accumulate(make_strided(&amp;v, nr), make_strided(&amp;v, nr, nc), <span class="fl">0.0</span>); });
+  <span class="cf">return</span> res;
+}
+
+<span class="co">// [[Rcpp::export]]</span>
+NumericVector strided_row_sum2(<span class="at">const</span> NumericMatrix&amp; x)
+{
+  <span class="kw">auto</span> nr = x.nrow();
+  NumericVector res(nr, <span class="fl">0.0</span>);
+  for_each(make_strided(begin(x), nr), make_strided(end(x)), [&amp;res, nr](<span class="at">const</span> <span class="dt">double</span>&amp; y) {
+    transform(&amp;y, &amp;y + nr, begin(res), begin(res), plus&lt;<span class="dt">double</span>&gt;()); });
   <span class="cf">return</span> res;
 }</code></pre></div>
 <p>Again, the <code>transform</code> with <code>accumulate</code> implementation is compact, but here the strided iterator is in the inner loop causing poor memory locality. The alternative implementation uses <code>for_each</code> with <code>make_strided</code> to skip to the top of each column and then uses <code>transform</code> to accumulate the values. The final range-based version is equivalent to the <code>for_each</code> with <code>transform</code> version.</p>
@@ -359,29 +358,29 @@ NumericVector range_row_sum(<span class="at">const</span> NumericMatrix&amp; x)
 </tr></thead>
 <tbody>
 <tr class="odd">
-<td align="left">strided_row_sum2(x)</td>
-<td align="right">1915.0</td>
-<td align="right">1.0</td>
-</tr>
-<tr class="even">
 <td align="left">indx_row_sum(x)</td>
-<td align="right">1912.1</td>
-<td align="right">1.0</td>
-</tr>
-<tr class="odd">
-<td align="left">range_row_sum(x)</td>
-<td align="right">1898.5</td>
+<td align="right">1913.6</td>
 <td align="right">1.0</td>
 </tr>
 <tr class="even">
-<td align="left">strided_row_sum(x)</td>
-<td align="right">495.4</td>
+<td align="left">range_row_sum(x)</td>
+<td align="right">1882.3</td>
+<td align="right">1.0</td>
+</tr>
+<tr class="odd">
+<td align="left">strided_row_sum2(x)</td>
+<td align="right">1801.7</td>
+<td align="right">0.9</td>
+</tr>
+<tr class="even">
+<td align="left">rowSums(x)</td>
+<td align="right">480.7</td>
 <td align="right">0.3</td>
 </tr>
 <tr class="odd">
-<td align="left">rowSums(x)</td>
-<td align="right">480.4</td>
-<td align="right">0.3</td>
+<td align="left">strided_row_sum(x)</td>
+<td align="right">355.5</td>
+<td align="right">0.2</td>
 </tr>
 </tbody>
 </table>
@@ -425,14 +424,42 @@ range_loop_convolve2(<span class="at">const</span> NumericMatrix&amp; a,
     ncab = nca + ncb - <span class="dv">1</span>;
   NumericMatrix ab(nrab, ncab);
   <span class="kw">auto</span> iter1 = make_strided(begin(ab), nrab);
-  <span class="cf">for</span> (<span class="at">const</span> <span class="kw">auto</span>&amp; t : make_strided_range(begin(a), nra, nca))    {
+  <span class="cf">for</span> (<span class="at">const</span> <span class="kw">auto</span>&amp; t : make_strided_range(begin(a), nra, nca)) {
     <span class="kw">auto</span> iter2 = make_strided(&amp;*iter1++, nrab);
-    <span class="cf">for</span> (<span class="at">const</span> <span class="kw">auto</span>&amp; u : make_strided_range(begin(b), nrb, ncb))  {
+    <span class="cf">for</span> (<span class="at">const</span> <span class="kw">auto</span>&amp; u : make_strided_range(begin(b), nrb, ncb)) {
       <span class="kw">auto</span> iter3 = &amp;*iter2++;
-      <span class="cf">for</span> (<span class="at">const</span> <span class="kw">auto</span>&amp; v : make_strided_range(&amp;t, <span class="dv">1</span>, nra))        {
+      <span class="cf">for</span> (<span class="at">const</span> <span class="kw">auto</span>&amp; v : make_strided_range(&amp;t, <span class="dv">1</span>, nra)) {
         <span class="kw">auto</span> iter4 = iter3++;
-        <span class="cf">for</span> (<span class="at">const</span> <span class="kw">auto</span>&amp; w : make_strided_range(&amp;u, <span class="dv">1</span>, nrb))      {
-          *iter4++ += v * w;                                      }}}}
+        <span class="cf">for</span> (<span class="at">const</span> <span class="kw">auto</span>&amp; w : make_strided_range(&amp;u, <span class="dv">1</span>, nrb)) {
+          *iter4++ += v * w; }}}}
+  <span class="cf">return</span> ab;
+}
+
+<span class="co">// [[Rcpp::export]]</span>
+NumericMatrix
+stl_algo_convolve2(<span class="at">const</span> NumericMatrix&amp; a,
+                   <span class="at">const</span> NumericMatrix&amp; b)
+{
+  <span class="dt">int</span>
+    nra = a.nrow(), nca = a.ncol(),
+    nrb = b.nrow(), ncb = b.ncol(),
+    nrab = nra + nrb - <span class="dv">1</span>,
+    ncab = nca + ncb - <span class="dv">1</span>;
+  NumericMatrix ab(nrab, ncab);
+  transform(make_strided(begin(a), nra), make_strided(end(a)),
+            make_strided(begin(ab), nrab), make_strided(begin(ab), nrab),
+            [&amp;](<span class="at">const</span> <span class="dt">double</span>&amp; t, <span class="dt">double</span>&amp; u) {
+    transform(make_strided(begin(b), nrb), make_strided(end(b)),
+              make_strided(&amp;u, nrab), make_strided(&amp;u, nrab),
+              [&amp;](<span class="at">const</span> <span class="dt">double</span>&amp; v, <span class="dt">double</span>&amp; w) {
+      transform(&amp;t, &amp;t + nra, &amp;w, &amp;w,
+                [&amp;](<span class="at">const</span> <span class="dt">double</span> x, <span class="dt">double</span>&amp; y) {
+        transform(&amp;v, &amp;v + nrb, &amp;y, &amp;y,
+                  [&amp;](<span class="at">const</span> <span class="dt">double</span> z, <span class="at">const</span> <span class="dt">double</span> zz) {
+          <span class="cf">return</span> zz + x * z; });
+        <span class="cf">return</span> y; });
+      <span class="cf">return</span> w; });
+    <span class="cf">return</span> u; });
   <span class="cf">return</span> ab;
 }</code></pre></div>
 <p>As a quick test, I check whether the convolution is invariant to the delta function as required.</p>
@@ -442,14 +469,7 @@ b =<span class="st"> </span><span class="kw">matrix</span>(<span class="kw">c</s
              <span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">0</span>,
              <span class="dv">0</span>, <span class="dv">1</span>, <span class="dv">0</span>,
              <span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">0</span>), <span class="dv">4</span>, <span class="dv">3</span>, <span class="dt">byrow =</span> <span class="ot">TRUE</span>)
-<span class="kw">convolve2_cpp</span>(a, b)</code></pre></div>
-<pre><code>##      [,1] [,2] [,3] [,4] [,5]
-## [1,]    0    0    0    0    0
-## [2,]    0    0    0    0    0
-## [3,]    0    1    2    3    0
-## [4,]    0    4    5    6    0
-## [5,]    0    0    0    0    0</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">range_loop_convolve2</span>(a, b)</code></pre></div>
+<span class="kw">stl_algo_convolve2</span>(a, b)</code></pre></div>
 <pre><code>##      [,1] [,2] [,3] [,4] [,5]
 ## [1,]    0    0    0    0    0
 ## [2,]    0    0    0    0    0
@@ -466,19 +486,29 @@ b =<span class="st"> </span><span class="kw">matrix</span>(<span class="kw">c</s
 </tr></thead>
 <tbody>
 <tr class="odd">
-<td align="left">range_loop_convolve2(a, b)</td>
-<td align="right">399.4</td>
+<td align="left">stl_algo_convolve2(a, b)</td>
+<td align="right">447.1</td>
 <td align="right">1.0</td>
 </tr>
 <tr class="even">
+<td align="left">range_loop_convolve2(a, b)</td>
+<td align="right">397.5</td>
+<td align="right">0.9</td>
+</tr>
+<tr class="odd">
 <td align="left">convolve2_cpp(a, b)</td>
-<td align="right">331.6</td>
-<td align="right">0.8</td>
+<td align="right">332.5</td>
+<td align="right">0.7</td>
 </tr>
 </tbody>
 </table>
-<p>The strided implementation appears to have a slight advantage, however these results may change on different systems. It is possible the index-offset calculations are making the indexed version slower. The importance of offset calculations should increase with the number of dimensions. It should be noted that these are not the fasted algorithms for performing convolution. If the kernel is separable, each dimension can be convolved individually. For large matrices, Fourier methods are faster still.</p>
+<p>The transform-based implementation appears to have a slight advantage, however these results may change on different systems. It is possible the index-offset calculations are making the indexed version slower. The importance of offset calculations should increase with the number of dimensions. It should be noted that these are not the fasted algorithms for performing convolution. If the kernel is separable, each dimension can be convolved individually. For large matrices, Fourier methods are faster still.</p>
 </div>
+</div>
+<div id="other-approaches" class="section level2">
+<h2 class="hasAnchor">
+<a href="#other-approaches" class="anchor"></a>Other approaches</h2>
+<p>Note that <a href="https://www.boost.org/doc/libs/release/libs/range/">Boost Range</a> and the <a href="https://github.com/ericniebler/range-v3">range v3 proposal</a> have strided iterators. Also, the <a href="https://github.com/QuantStack/xtensor">xtensor</a> library appears to be the heir-apparent for working with multidimensional data in C++ and perhaps <a href="https://cran.r-project.org/package=xtensor">R</a> as well. I have not tried to implement a 2D covolution with these, however it would be an interesting experiment.</p>
 </div>
 <div id="conclusions" class="section level2">
 <h2 class="hasAnchor">
@@ -497,6 +527,7 @@ b =<span class="st"> </span><span class="kw">matrix</span>(<span class="kw">c</s
       <ul class="nav nav-pills nav-stacked">
 <li><a href="#introduction">Introduction</a></li>
       <li><a href="#strided_iterator-and-strided_range">Strided_iterator and strided_range</a></li>
+      <li><a href="#other-approaches">Other approaches</a></li>
       <li><a href="#conclusions">Conclusions</a></li>
       </ul>
 </div>
