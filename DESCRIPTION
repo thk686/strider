@@ -2,7 +2,7 @@ Package: strider
 Type: Package
 Title: Strided Iterator and Range
 Version: 1.1
-Date: 2017-1-9
+Date: 2018-1-9
 Authors@R: person("Tim", "Keitt", email = "tkeitt@gmail.com", role = c("aut", "cre"))
 Description: The strided iterator adapts multidimensional buffers to work with 
   the C++ standard library and range-based for-loops. Given a pointer or iterator
