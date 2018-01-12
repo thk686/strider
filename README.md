@@ -1,7 +1,7 @@
 Strider
 ================
 Timothy H. Keitt
-2018-01-10
+2018-01-12
 
 "I don't think he knows about second breakfast" - Meriadoc 'Merry' Brandybuck
 
@@ -16,7 +16,7 @@ This code snippet computes row sums of a matrix.
 
 It is cache and compiler friendly and runs nearly four times faster than R's built-in `rowSums` function. See [the vignette](https://thk686.github.io/strider/articles/strider.html) for details.
 
-The header file is stand-alone and can be used separate from [R](https://www.r-project.org). It relies on the [Boost iterator library](https://www.boost.org/doc/libs/release/libs/iterator/).
+[The header file](https://github.com/thk686/strider/blob/master/inst/include/strider.h) is stand-alone and can be used separate from [R](https://www.r-project.org). It relies on the [Boost iterator library](https://www.boost.org/doc/libs/release/libs/iterator/).
 
 #### Installation
 
