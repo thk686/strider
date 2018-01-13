@@ -63,7 +63,7 @@
       <h1>The Strider Package</h1>
                         <h4 class="author">Timothy H. Keitt</h4>
             
-            <h4 class="date">2018-01-10</h4>
+            <h4 class="date">2018-01-13</h4>
           </div>
 
     
@@ -74,7 +74,7 @@
 <h2 class="hasAnchor">
 <a href="#introduction" class="anchor"></a>Introduction</h2>
 <p>The <a href="http://en.cppreference.com/w/">C++ standard library</a> introduced generic algorithms that operate on a sequences defined by begin-end iterator-pairs. These generic algorithms can be used to replace C-style for-loops over indices. They are thought to reduce common code bugs resulting from off-by-n indexing errors that can result in buffer overruns and other illogical behavior. Some have even suggested <a href="https://channel9.msdn.com/Events/GoingNative/2013/Cpp-Seasoning">“no raw loops”</a> as a rule. Applying the standard library algorithms is often straightforward for simple sequences bounded by iterators. When working with multidimensional data like matrices however, many authors revert to computing indices, either because it is more explicit and therefor easier to implement or because the multidimensional data structures do not offer pre-defined iterators.</p>
-<p>The difficulty applying the standard library algorithms to multidimensional data stems from the fact that successive dimensions must follow leading dimensions and this necessitates skips when iterating. Solving this requires a strided iterator that skips over intermediate memory locations when incrementing or decrementing. Having myself often reverted to indices when implementing algorithms on multidimensional data, while simultaneously wishing for more consistency with the standard library, I decided to implement a strided pointer class and wrap it in the new R library <strong>strider</strong>. The header is installed with the package, so it can be used by other packages via the LinkingTo directive in the DESCRIPTION file. <strong>The header has no dependencies on R and so can be used separately.</strong></p>
+<p>The difficulty applying the standard library algorithms to multidimensional data stems from the fact that successive dimensions must follow leading dimensions and this necessitates skips when iterating. Solving this requires a strided iterator that skips over intermediate memory locations when incrementing or decrementing. Having myself often reverted to indices when implementing algorithms on multidimensional data, while simultaneously wishing for more consistency with the standard library, I decided to implement a strided pointer class and wrap it in the new R library <strong>strider</strong>. The header is installed with the package, so it can be used by other packages via the LinkingTo directive in the DESCRIPTION file. <strong>The header has no dependencies on R and so can be used in pure C++ projects.</strong></p>
 <div id="replacing-index-loops-with-standard-library-algorithms" class="section level3">
 <h3 class="hasAnchor">
 <a href="#replacing-index-loops-with-standard-library-algorithms" class="anchor"></a>Replacing index loops with standard library algorithms</h3>
@@ -162,7 +162,7 @@ range_loop_convolve(<span class="at">const</span> NumericVector&amp; a,
   <span class="cf">return</span> ab;
 }</code></pre></div>
 <p>The main difference here is we have to manually increment the output iterator. That could be solved using a zip iterator adapter. (Convenient tuple syntax for this case is available in C++17.) Nonetheless, this example demonstrates how expressive range-based for-loops can be while avoiding explicit indices.</p>
-<p>There is no particular performance advantage to avoiding indices, so the choice is largely a matter of taste. Modern compilers will produce similar if not the exact same instructions regardless of the type of loop. Benchmarking comparisons can however point out problems with a particular implementation. It is useful to recall that benchmark differences within <span class="math inline">\(\pm 10\%\)</span> are likely meaningless and results will vary in different environments. Relative numbers below are therefore printed using <code>digits = 1</code> to demphasize small differences. With two vectors of length <span class="math inline">\(10^4\)</span>, I get the following run times for the different loop implementations.</p>
+<p>There is no particular performance advantage to avoiding indices, so the choice is largely a matter of taste. Modern compilers will produce similar if not the exact same instructions regardless of the type of loop. Benchmarking comparisons can however point out problems with a particular implementation. It is useful to recall that benchmark differences within <span class="math inline">\(\pm 10\%\)</span> are likely meaningless and results will vary in different environments. Relative numbers below are therefore printed using <code>digits = 1</code> to demphasize small differences. With two vectors of length <span class="math inline">\(10^4\)</span>, I get the following performances for the different loop implementations.</p>
 <table class="table">
 <caption>Evaluations per second</caption>
 <thead><tr class="header">
@@ -172,18 +172,18 @@ range_loop_convolve(<span class="at">const</span> NumericVector&amp; a,
 </tr></thead>
 <tbody>
 <tr class="odd">
-<td align="left">range_loop_convolve(a, b)</td>
-<td align="right">102.2</td>
+<td align="left">stl_algo_convolve(a, b)</td>
+<td align="right">89.5</td>
 <td align="right">1</td>
 </tr>
 <tr class="even">
-<td align="left">stl_algo_convolve(a, b)</td>
-<td align="right">102.2</td>
+<td align="left">convolve_cpp(a, b)</td>
+<td align="right">88.6</td>
 <td align="right">1</td>
 </tr>
 <tr class="odd">
-<td align="left">convolve_cpp(a, b)</td>
-<td align="right">100.8</td>
+<td align="left">range_loop_convolve(a, b)</td>
+<td align="right">88.5</td>
 <td align="right">1</td>
 </tr>
 </tbody>
@@ -266,23 +266,23 @@ NumericVector strided_col_sum(<span class="at">const</span> NumericMatrix&amp; x
 </tr></thead>
 <tbody>
 <tr class="odd">
-<td align="left">strided_col_sum(x)</td>
-<td align="right">1066.8</td>
+<td align="left">range_col_sum(x)</td>
+<td align="right">1021.7</td>
 <td align="right">1</td>
 </tr>
 <tr class="even">
 <td align="left">colSums(x)</td>
-<td align="right">1043.1</td>
+<td align="right">1010.7</td>
 <td align="right">1</td>
 </tr>
 <tr class="odd">
-<td align="left">range_col_sum(x)</td>
-<td align="right">1037.6</td>
+<td align="left">strided_col_sum(x)</td>
+<td align="right">1007.5</td>
 <td align="right">1</td>
 </tr>
 <tr class="even">
 <td align="left">indx_col_sum(x)</td>
-<td align="right">1029.3</td>
+<td align="right">1000.2</td>
 <td align="right">1</td>
 </tr>
 </tbody>
@@ -358,29 +358,29 @@ NumericVector strided_row_sum2(<span class="at">const</span> NumericMatrix&amp; 
 </tr></thead>
 <tbody>
 <tr class="odd">
-<td align="left">indx_row_sum(x)</td>
-<td align="right">1869.9</td>
+<td align="left">strided_row_sum2(x)</td>
+<td align="right">1869.5</td>
 <td align="right">1.0</td>
 </tr>
 <tr class="even">
-<td align="left">strided_row_sum2(x)</td>
-<td align="right">1861.2</td>
+<td align="left">range_row_sum(x)</td>
+<td align="right">1835.2</td>
 <td align="right">1.0</td>
 </tr>
 <tr class="odd">
-<td align="left">range_row_sum(x)</td>
-<td align="right">1855.5</td>
+<td align="left">indx_row_sum(x)</td>
+<td align="right">1793.5</td>
 <td align="right">1.0</td>
 </tr>
 <tr class="even">
 <td align="left">strided_row_sum(x)</td>
-<td align="right">517.2</td>
+<td align="right">505.9</td>
 <td align="right">0.3</td>
 </tr>
 <tr class="odd">
 <td align="left">rowSums(x)</td>
-<td align="right">482.9</td>
-<td align="right">0.3</td>
+<td align="right">452.8</td>
+<td align="right">0.2</td>
 </tr>
 </tbody>
 </table>
@@ -487,18 +487,18 @@ b =<span class="st"> </span><span class="kw">matrix</span>(<span class="kw">c</s
 <tbody>
 <tr class="odd">
 <td align="left">stl_algo_convolve2(a, b)</td>
-<td align="right">446.7</td>
+<td align="right">436.0</td>
 <td align="right">1.0</td>
 </tr>
 <tr class="even">
 <td align="left">range_loop_convolve2(a, b)</td>
-<td align="right">398.6</td>
+<td align="right">393.0</td>
 <td align="right">0.9</td>
 </tr>
 <tr class="odd">
 <td align="left">convolve2_cpp(a, b)</td>
-<td align="right">333.5</td>
-<td align="right">0.7</td>
+<td align="right">327.7</td>
+<td align="right">0.8</td>
 </tr>
 </tbody>
 </table>
@@ -508,7 +508,7 @@ b =<span class="st"> </span><span class="kw">matrix</span>(<span class="kw">c</s
 <div id="other-approaches" class="section level2">
 <h2 class="hasAnchor">
 <a href="#other-approaches" class="anchor"></a>Other approaches</h2>
-<p>Note that <a href="https://www.boost.org/doc/libs/release/libs/range/">Boost Range</a> and the <a href="https://github.com/ericniebler/range-v3">range v3 proposal</a> have strided iterators. Also, the <a href="https://github.com/QuantStack/xtensor">xtensor</a> library appears to be the heir-apparent for working with multidimensional data in C++ and perhaps <a href="https://cran.r-project.org/package=xtensor">R</a> as well. I have not tried to implement a 2D covolution with these, however it would be an interesting experiment.</p>
+<p>Note that <a href="https://www.boost.org/doc/libs/release/libs/range/">Boost Range</a> and the <a href="https://github.com/ericniebler/range-v3">range v3 proposal</a> have strided iterators. Of course, <a href="http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2014/n3851.pdf">Herb Sutter has already thought of everything</a>, and there is an implementaiton <a href="https://github.com/wardw/array_view">here</a>. The <a href="https://github.com/QuantStack/xtensor">xtensor</a> library appears to be the heir-apparent for working with multidimensional data in C++ and perhaps <a href="https://cran.r-project.org/package=xtensor">R as well</a>. I have not tried to implement a 2D covolution with these, however it would be an interesting experiment.</p>
 </div>
 <div id="conclusions" class="section level2">
 <h2 class="hasAnchor">
