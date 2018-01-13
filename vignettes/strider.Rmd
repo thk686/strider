@@ -515,7 +515,7 @@ The transform-based implementation appears to have a slight advantage, however t
 
 ## Other approaches
 
-Note that [Boost Range](https://www.boost.org/doc/libs/release/libs/range/) and the [range v3 proposal](https://github.com/ericniebler/range-v3) have strided iterators. Also, the [xtensor](https://github.com/QuantStack/xtensor) library appears to be the heir-apparent for working with multidimensional data in C++ and perhaps [R as well](https://cran.r-project.org/package=xtensor). I have not tried to implement a 2D covolution with these, however it would be an interesting experiment.
+Note that [Boost Range](https://www.boost.org/doc/libs/release/libs/range/) and the [range v3 proposal](https://github.com/ericniebler/range-v3) have strided iterators. Of course, [Herb Sutter has already thought of everything](http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2014/n3851.pdf), and there is an implementaiton [here](https://github.com/wardw/array_view). The [xtensor](https://github.com/QuantStack/xtensor) library appears to be the heir-apparent for working with multidimensional data in C++ and perhaps [R as well](https://cran.r-project.org/package=xtensor). I have not tried to implement a 2D covolution with these, however it would be an interesting experiment.
 
 ## Conclusions
 
