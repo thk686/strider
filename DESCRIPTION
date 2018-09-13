@@ -12,7 +12,7 @@ Description: The strided iterator adapts multidimensional buffers to work with
   These help authors to avoid integer-based indexing, which in some cases can impede
   algorithm performance and introduce indexing errors. This library exists
   primarily to expose the header file to other R projects.
-License: GPL (>= 2)
+License: MIT + file LICENSE
 Imports: Rcpp (>= 0.12.13)
 LinkingTo: Rcpp, BH
 Suggests: 
