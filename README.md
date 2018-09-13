@@ -1,7 +1,7 @@
 Strider
 ================
 Timothy H. Keitt
-2018-01-13
+2018-09-13
 
 "I don't think he knows about second breakfast" - Meriadoc 'Merry' Brandybuck
 
@@ -22,6 +22,8 @@ It is cache and compiler friendly and runs nearly four times faster than R's bui
 
     devtools::install_github("thk686/strider")
 
-[![CRAN status](http://www.r-pkg.org/badges/version/strider)](https://cran.r-project.org/package=strider) [![Travis build status](https://travis-ci.org/thk686/strider.svg?branch=master)](https://travis-ci.org/thk686/strider) [![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/github/thk686/strider?branch=master&svg=true)](https://ci.appveyor.com/project/thk686/strider) [![Coverage status](https://codecov.io/gh/thk686/strider/branch/master/graph/badge.svg)](https://codecov.io/github/thk686/strider?branch=master)
+<!--- [![CRAN status](https://www.r-pkg.org/badges/version/strider)](https://cran.r-project.org/package=strider) --->
+
+[![Travis build status](https://travis-ci.org/thk686/strider.svg?branch=master)](https://travis-ci.org/thk686/strider) [![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/github/thk686/strider?branch=master&svg=true)](https://ci.appveyor.com/project/thk686/strider) [![Coverage status](https://codecov.io/gh/thk686/strider/branch/master/graph/badge.svg)](https://codecov.io/github/thk686/strider?branch=master) [![DOI](https://zenodo.org/badge/109467352.svg)](https://zenodo.org/badge/latestdoi/109467352)
 
 <!--- [![Depsy](http://depsy.org/api/package/cran/strider/badge.svg)](http://depsy.org/package/r/strider) --->
