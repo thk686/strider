@@ -22,7 +22,8 @@ Suggests:
     microbenchmark,
     ggplot2,
     dplyr,
-    covr
+    covr,
+    BH
 VignetteBuilder: knitr
 URL: https://github.com/thk686/strider
 BugReports: https://github.com/thk686/strider/issues
